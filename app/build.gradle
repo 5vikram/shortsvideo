@@ -1,6 +1,7 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
 
 android {
@@ -8,7 +9,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.multitv.ott.shortvideo"
+        //applicationId "com.multitv.ott.shortvideo"
         minSdk 26
         targetSdk 34
         versionCode 1
@@ -44,6 +45,21 @@ android {
         javaMaxHeapSize "4G"
     }
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.github.5vikram"
+                artifactId = "ShortsVideo"
+                version = "1.0.0"
+            }
+        }
+    }
+}
+
 
 dependencies {
     implementation 'androidx.media3:media3-exoplayer-ima:1.2.0'
