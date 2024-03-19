@@ -3,8 +3,10 @@ package com.multitv.ott.shortvideo.uttls
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.multitv.ott.shortvideo.R
 
 import com.multitv.ott.shortvideo.utils.Tracer
 import java.io.InputStream
@@ -74,6 +76,20 @@ class CommonUtils {
 
     private fun getUrlExtension(url: String): String {
         return url.substring(url.lastIndexOf(".") + 1)
+    }
+
+
+    fun shareIntent(body: String, context: Context?) {
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, body)
+        context?.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                context.getString(R.string.send_to)
+            )
+        )
     }
 
 }

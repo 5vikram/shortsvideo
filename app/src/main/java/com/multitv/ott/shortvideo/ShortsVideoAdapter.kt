@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
+import com.multitv.ott.shortvideo.listener.ShareVideoListener
 import com.multitv.ott.shortvideo.utils.Tracer
 
 class ShortsVideoAdapter(
@@ -18,6 +19,7 @@ class ShortsVideoAdapter(
     private val videoCacheUrlList: List<ContentItem>,
     recyclerView: RecyclerView,
     private val onLoadMoreListener: OnLoadMoreListener,
+    private val shareVideoListener: ShareVideoListener
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -69,7 +71,7 @@ class ShortsVideoAdapter(
             val share_img = playerLayout.findViewById<ImageView>(R.id.share_img_new)
             share_img.setOnClickListener {
                 if (!videoCacheUrlList[adapterPosition].shareUrl.isNullOrEmpty())
-                    shortVideoListener.onShareVideoIconClicked(videoCacheUrlList[adapterPosition].shareUrl!!)
+                    shareVideoListener.shareVideo(videoCacheUrlList[adapterPosition].shareUrl!!)
             }
 
         }

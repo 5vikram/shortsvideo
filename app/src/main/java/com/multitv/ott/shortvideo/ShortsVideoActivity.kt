@@ -34,6 +34,7 @@ import com.jaeger.library.StatusBarUtil
 import com.multitv.ott.shortvideo.databinding.ShortVideoLayoutBinding
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.OnViewPagerListener
+import com.multitv.ott.shortvideo.listener.ShareVideoListener
 import com.multitv.ott.shortvideo.model.AuthModel
 import com.multitv.ott.shortvideo.network.CommonApiListener
 import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
@@ -51,7 +52,7 @@ import com.multitv.ott.shortvideo.uttls.PlayerConstant.FORWARD_INCREMENT
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MAX_BUFFER_DURATION
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MIN_BUFFER_DURATION
 
-class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener {
+class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoListener {
 
     private val contentHomeList = ArrayList<ContentItem>()
     private var layoutManager: ViewPagerLayoutManager? = null
@@ -125,7 +126,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener {
                             this@ShortsVideoActivity,
                             contentHomeList,
                             binding.tictocRecyclerview,
-                            this@ShortsVideoActivity
+                            this@ShortsVideoActivity, this@ShortsVideoActivity
                         )
                     binding.tictocRecyclerview.adapter = shortsVideoAdapter
 
@@ -555,6 +556,10 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener {
 
     override fun onLoadMore() {
 
+    }
+
+    override fun shareVideo(shareUrl: String) {
+        CommonUtils().shareIntent(shareUrl, this)
     }
 
 
