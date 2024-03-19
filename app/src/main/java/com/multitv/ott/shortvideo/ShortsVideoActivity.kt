@@ -189,7 +189,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         val header = HashMap<String, String>()
         val params = HashMap<String, String>()
 
-        var contentListUrl = authModel.masterUrls?.contentList + endPointContentListUrl
+        var contentListUrl =
+            authModel.masterUrls?.contentList + vaildationTokenRequest + endPointContentListUrl
 
         CommonApiPresenterImpl(object : CommonApiListener {
             @SuppressLint("NotifyDataSetChanged")
