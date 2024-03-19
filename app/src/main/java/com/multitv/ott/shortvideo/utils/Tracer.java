@@ -12,7 +12,7 @@ import android.widget.Toast;
  */
 
 public class Tracer {
-    private final static Boolean LOG_ENABLE = true;
+    private final static Boolean LOG_ENABLE = false;
 
     /**
      * Method to print debug log<br>

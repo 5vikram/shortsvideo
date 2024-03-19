@@ -17,6 +17,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -34,11 +35,13 @@ import com.multitv.ott.shortvideo.databinding.ShortVideoLayoutBinding
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.OnViewPagerListener
 import com.multitv.ott.shortvideo.listener.ShortVideoListener
+import com.multitv.ott.shortvideo.model.AuthModel
 import com.multitv.ott.shortvideo.network.CommonApiListener
 import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
 import com.multitv.ott.shortvideo.network.Json
 import com.multitv.ott.shortvideo.utils.ScreenUtils
 import com.multitv.ott.shortvideo.utils.Tracer
+import com.multitv.ott.shortvideo.utils.Uttils
 import com.multitv.ott.shortvideo.utils.ViewPagerLayoutManager
 import com.multitv.ott.shortvideo.uttls.CommonUtils
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.ALLOCATION_SIZE
@@ -56,10 +59,13 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
     private var layoutManager: ViewPagerLayoutManager? = null
     private var shortsVideoAdapter: ShortsVideoAdapter? = null
 
-    private var contentUrl =
-        "https://expo.multitvsolution.com/api/v6/content/list/token/15zh353kd4dese/device/android/current_offset/0/max_counter/100/cat_id/3437"
+    private var endPointContentListUrl =
+        "/device/android/current_offset/0/max_counter/100/cat_id/3437"
 
+    private var authUrl =
+        "https://expo.multitvsolution.com/api/v6/get/validate/token/package_id/12/token/"
 
+    //15zh353kd4dese
     private var mCurPos = 0
 
     private lateinit var styledPlayerView: StyledPlayerView
@@ -78,52 +84,103 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
     private var seekBackIncrementMs = BACKWARD_INCREMENT
     private var seekForwardIncrementMs = FORWARD_INCREMENT
 
+    private var vaildationTokenRequest: String? = null
+    private lateinit var authModel: AuthModel
+
 
     private lateinit var binding: ShortVideoLayoutBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.setTransparent(this)
         binding = DataBindingUtil.setContentView(this, R.layout.short_video_layout)
+        vaildationTokenRequest = intent?.getStringExtra(Uttils.TOKEN)
 
-        layoutManager = ViewPagerLayoutManager(
-            this,
-            OrientationHelper.VERTICAL
-        )
-        layoutManager?.initialPrefetchItemCount = 3
-        binding.tictocRecyclerview.setItemViewCacheSize(20)
-        layoutManager?.setExtraLayoutSpace(ScreenUtils.getScreenHeight(this))
-        binding.tictocRecyclerview.layoutManager = layoutManager
-        binding.tictocRecyclerview.isNestedScrollingEnabled = true
-
-        shortsVideoAdapter =
-            ShortsVideoAdapter(this, contentHomeList, this, binding.tictocRecyclerview, this)
-        binding.tictocRecyclerview.adapter = shortsVideoAdapter
-
-        getVideoDetailsData(false)
-
-        layoutManager?.setOnViewPagerListener(object : OnViewPagerListener {
-            override fun onInitComplete() {
-                setVideoPlayer(mCurPos)
-            }
-
-            override fun onPageRelease(isNext: Boolean, position: Int) {
-
-            }
-
-            override fun onPageSelected(position: Int, isBottom: Boolean) {
-
-                if (mCurPos == position) return
-
-                setVideoPlayer(position)
-
-            }
-
-            override fun loadImageNextPerviousItem(isNext: Boolean, position: Int) {
-
-            }
-
-        })
+        if (!vaildationTokenRequest.isNullOrEmpty())
+            authenticationToken()
+        else
+            finish()
     }
+
+    private fun authenticationToken() {
+        val header = HashMap<String, String>()
+        binding.loadMoreProgressbar.visibility = View.VISIBLE
+
+        //var contentListUrl=authModel.masterUrls.
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String?) {
+                binding.loadMoreProgressbar.visibility = View.GONE
+                authModel = Json.parse(response, AuthModel::class.java) as AuthModel
+
+                if (authModel.code == 1) {
+                    layoutManager =
+                        ViewPagerLayoutManager(this@ShortsVideoActivity, OrientationHelper.VERTICAL)
+                    layoutManager?.initialPrefetchItemCount = 3
+                    binding.tictocRecyclerview.setItemViewCacheSize(20)
+                    layoutManager?.setExtraLayoutSpace(ScreenUtils.getScreenHeight(this@ShortsVideoActivity))
+                    binding.tictocRecyclerview.layoutManager = layoutManager
+                    binding.tictocRecyclerview.isNestedScrollingEnabled = true
+
+                    shortsVideoAdapter =
+                        ShortsVideoAdapter(
+                            this@ShortsVideoActivity,
+                            contentHomeList,
+                            this@ShortsVideoActivity,
+                            binding.tictocRecyclerview,
+                            this@ShortsVideoActivity
+                        )
+                    binding.tictocRecyclerview.adapter = shortsVideoAdapter
+
+                    getVideoDetailsData(false)
+
+                    layoutManager?.setOnViewPagerListener(object : OnViewPagerListener {
+                        override fun onInitComplete() {
+                            setVideoPlayer(mCurPos)
+                        }
+
+                        override fun onPageRelease(isNext: Boolean, position: Int) {
+
+                        }
+
+                        override fun onPageSelected(position: Int, isBottom: Boolean) {
+
+                            if (mCurPos == position) return
+
+                            setVideoPlayer(position)
+
+                        }
+
+                        override fun loadImageNextPerviousItem(isNext: Boolean, position: Int) {
+
+                        }
+
+                    })
+
+                } else {
+                    Toast.makeText(
+                        this@ShortsVideoActivity,
+                        Uttils.INVAILD_USER,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }
+            }
+
+            override fun onError(message: String?) {
+                binding.loadMoreProgressbar.visibility = View.GONE
+                Toast.makeText(
+                    this@ShortsVideoActivity,
+                    Uttils.INVAILD_USER,
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
+
+        }).getRequest(authUrl + vaildationTokenRequest, "Auth Url", header)
+
+    }
+
 
     private fun getVideoDetailsData(isLoadMoreVideo: Boolean) {
         if (isLoadMoreVideo)
@@ -133,6 +190,8 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
 
         val header = HashMap<String, String>()
         val params = HashMap<String, String>()
+
+        var contentListUrl = authModel.masterUrls?.contentList + endPointContentListUrl
 
         CommonApiPresenterImpl(object : CommonApiListener {
             @SuppressLint("NotifyDataSetChanged")
@@ -158,7 +217,7 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
                 binding.loadMoreProgressbar.visibility = View.GONE
             }
 
-        }).getRequest(contentUrl, "Vikram", header)
+        }).getRequest(contentListUrl, "Content List Url", header)
 
     }
 
@@ -505,7 +564,7 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
 
             override fun onAnimationRepeat(animation: Animation) {}
         })
-        music01!!.startAnimation(animation1)
+        music01?.startAnimation(animation1)
     }
 
     private fun callSecondAnimation() {
@@ -520,7 +579,7 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
 
             override fun onAnimationRepeat(animation: Animation) {}
         })
-        music02!!.startAnimation(animation2)
+        music02?.startAnimation(animation2)
     }
 
     override fun onPause() {
