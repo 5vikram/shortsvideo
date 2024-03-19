@@ -34,13 +34,11 @@ import com.jaeger.library.StatusBarUtil
 import com.multitv.ott.shortvideo.databinding.ShortVideoLayoutBinding
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.OnViewPagerListener
-import com.multitv.ott.shortvideo.listener.ShortVideoListener
 import com.multitv.ott.shortvideo.model.AuthModel
 import com.multitv.ott.shortvideo.network.CommonApiListener
 import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
 import com.multitv.ott.shortvideo.network.Json
 import com.multitv.ott.shortvideo.utils.ScreenUtils
-import com.multitv.ott.shortvideo.utils.Tracer
 import com.multitv.ott.shortvideo.utils.Uttils
 import com.multitv.ott.shortvideo.utils.ViewPagerLayoutManager
 import com.multitv.ott.shortvideo.uttls.CommonUtils
@@ -53,7 +51,7 @@ import com.multitv.ott.shortvideo.uttls.PlayerConstant.FORWARD_INCREMENT
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MAX_BUFFER_DURATION
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MIN_BUFFER_DURATION
 
-class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreListener {
+class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener {
 
     private val contentHomeList = ArrayList<ContentItem>()
     private var layoutManager: ViewPagerLayoutManager? = null
@@ -126,7 +124,6 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
                         ShortsVideoAdapter(
                             this@ShortsVideoActivity,
                             contentHomeList,
-                            this@ShortsVideoActivity,
                             binding.tictocRecyclerview,
                             this@ShortsVideoActivity
                         )
@@ -397,47 +394,6 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
 
     }
 
-
-    override fun onLoadMore() {
-
-    }
-
-    override fun onFollowIconClicked(
-        u_id: String,
-        userName: String,
-        regularTextView: TextView,
-        imageView: ImageView
-    ) {
-
-    }
-
-    override fun onUserProfileClicked(u_id: String) {
-
-    }
-
-    override fun onVideoLiked(
-        c_id: String,
-        contentName: String,
-        imageView: ImageView,
-        likesCountTv: TextView,
-        position: Int
-    ) {
-
-    }
-
-    override fun onCommentIconClicked(c_id: String) {
-
-    }
-
-    override fun onCommentDelete(c_id: String, comment_id: String) {
-
-    }
-
-    override fun onShareVideoIconClicked(shareUrl: String) {
-
-    }
-
-
     private fun checkForAudioFocus(): Boolean {
         // Request audio focus for playback
         val result = audioManager?.requestAudioFocus(
@@ -596,5 +552,10 @@ class ShortsVideoActivity : AppCompatActivity(), ShortVideoListener, OnLoadMoreL
         super.onResume()
         resumeVideoPlayer()
     }
+
+    override fun onLoadMore() {
+
+    }
+
 
 }
