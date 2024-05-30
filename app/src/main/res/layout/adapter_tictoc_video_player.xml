@@ -72,6 +72,8 @@
                     android:text="@string/vikram_sharma_text_updated"
                     android:textColor="@color/white"
                     android:textSize="12sp"
+                    tools:visibility="visible"
+                    android:visibility="gone"
                     android:textStyle="bold" />
 
                 <TextView

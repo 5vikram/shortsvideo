@@ -1,6 +1,7 @@
 package com.multitv.ott.shortvideo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -64,12 +65,17 @@ public class SkuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         if (contentHome.getTitle() != null && !TextUtils.isEmpty(contentHome.getTitle())) {
             itemViewHolder.titleTv.setText(contentHome.getTitle());
-        } else
+            itemViewHolder.titleTv.setVisibility(View.VISIBLE);
+        } else {
             itemViewHolder.titleTv.setText(context.getString(R.string.app_name));
+        }
 
         if (contentHome.getPrice() != null && !TextUtils.isEmpty(contentHome.getPrice())) {
             itemViewHolder.priceTv.setText("Rs " + contentHome.getPrice());
+            itemViewHolder.priceTv.setVisibility(View.VISIBLE);
             itemViewHolder.priceTv.setPaintFlags(itemViewHolder.titleTv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            itemViewHolder.priceTv.setVisibility(View.GONE);
         }
 
 
@@ -83,14 +89,12 @@ public class SkuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         itemViewHolder.adTobagTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-/*
                 if (contentHome.getRedirectUrl() != null && !TextUtils.isEmpty(contentHome.getRedirectUrl())) {
                     Intent intent = new Intent(context, WebViewActivity.class);
                     intent.putExtra("title", contentHome.getTitle());
                     intent.putExtra("url", contentHome.getRedirectUrl());
                     context.startActivity(intent);
                 }
-*/
             }
         });
 

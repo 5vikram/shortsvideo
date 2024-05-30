@@ -104,12 +104,19 @@ class ShortsVideoAdapter(
 
             val viewCountTv_new = playerLayout.findViewById<TextView>(R.id.viewCountTv_new)
 
-            if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title))
+            if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title)) {
                 videoTitleTv_new.text = contentHome.title
+                videoTitleTv_new.visibility = View.VISIBLE
+            } else {
+                videoTitleTv_new.visibility = View.GONE
+            }
 
-            if (contentHome.des != null && !TextUtils.isEmpty(contentHome.des))
+            if (contentHome.des != null && !TextUtils.isEmpty(contentHome.des)) {
                 descriptionTv_new.text = contentHome.des
-
+                descriptionTv_new.visibility = View.GONE
+            } else {
+                descriptionTv_new.visibility = View.GONE
+            }
             if (contentHome.isLike != null && contentHome.isLike != -1)
                 likeTv_new.text = "" + contentHome.isLike
             else

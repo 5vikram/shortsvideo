@@ -62,7 +62,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         "/device/android/current_offset/0/max_counter/100/cat_id/3437"
 
     private var authUrl =
-        "https://expo.multitvsolution.com/api/v6/get/validate/token/package_id/12/token/"
+        "https://expo.multitvsolution.com/api/v6/get/validate/token/package_id/12/token/15zh353kd4dese"
 
     //15zh353kd4dese
     private var mCurPos = 0
@@ -83,7 +83,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private var seekBackIncrementMs = BACKWARD_INCREMENT
     private var seekForwardIncrementMs = FORWARD_INCREMENT
 
-    private var vaildationTokenRequest: String? = null
+    // private var vaildationTokenRequest: String? = null
     private lateinit var authModel: AuthModel
 
 
@@ -92,12 +92,9 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         super.onCreate(savedInstanceState)
         StatusBarUtil.setTransparent(this)
         binding = DataBindingUtil.setContentView(this, R.layout.short_video_layout)
-        vaildationTokenRequest = intent?.getStringExtra(Uttils.TOKEN)
+        //  vaildationTokenRequest = intent?.getStringExtra(Uttils.TOKEN)
 
-        if (!vaildationTokenRequest.isNullOrEmpty())
-            authenticationToken()
-        else
-            finish()
+        authenticationToken()
     }
 
     private fun authenticationToken() {
@@ -175,7 +172,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
                 finish()
             }
 
-        }).getRequest(authUrl + vaildationTokenRequest, "Auth Url", header)
+        }).getRequest(authUrl, "Auth Url", header)
 
     }
 
@@ -190,7 +187,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         val params = HashMap<String, String>()
 
         var contentListUrl =
-            authModel.masterUrls?.contentList + vaildationTokenRequest + endPointContentListUrl
+            authModel.masterUrls?.contentList + "15zh353kd4dese" + endPointContentListUrl
 
         CommonApiPresenterImpl(object : CommonApiListener {
             @SuppressLint("NotifyDataSetChanged")

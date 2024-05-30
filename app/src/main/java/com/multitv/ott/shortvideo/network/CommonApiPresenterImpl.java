@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.multitv.ott.shortvideo.appcontroller.ApplicationController;
+import com.multitv.ott.shortvideo.utils.Tracer;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
     @Override
     public void postRequest(String url, String apiName, Map<String, String> params, Map<String, String> headers) {
 
-        Log.e("Api Request::::", apiName + "  url::::" + url);
+        Tracer.error("Api Request::::", apiName + "  url::::" + url);
 
         StringRequest jsonObjReq = new StringRequest(Request.Method.POST,
                 url, new Response.Listener<String>() {
@@ -32,7 +33,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
             public void onResponse(String response) {
                 try {
 
-                    Log.e("Api Request::::", apiName + "  response::::" + response);
+                    Tracer.error("Api Request::::", apiName + "  response::::" + response);
                     networkResponseListener.onSuccess(response);
 
                 } catch (Exception e) {
@@ -44,7 +45,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Api Request::::", apiName + "  response::::" + error.getMessage());
+                Tracer.error("Api Request::::", apiName + "  response::::" + error.getMessage());
                 networkResponseListener.onError(error.getMessage());
             }
         }) {
@@ -55,7 +56,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
                 if (headers != null && headers.size() > 0) {
                     Set<String> keySet = headers.keySet();
                     for (String key : keySet) {
-                        Log.e("Api Request::::", apiName + "  header::::" + key + "   " + headers.get(key));
+                        Tracer.error("Api Request::::", apiName + "  header::::" + key + "   " + headers.get(key));
                     }
                 }
 
@@ -69,7 +70,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
                 if (params != null && params.size() > 0) {
                     Set<String> keySet = params.keySet();
                     for (String key : keySet) {
-                        Log.e("Api Request::::", apiName + "  params::::" + key + "   " + params.get(key));
+                        Tracer.error("Api Request::::", apiName + "  params::::" + key + "   " + params.get(key));
                     }
 
                 }
@@ -89,7 +90,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
             @Override
             public void onResponse(String response) {
                 try {
-                    Log.e("api request", apiName + "  response::::" + response);
+                    Tracer.error("api request", apiName + "  response::::" + response);
                     networkResponseListener.onSuccess(response);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -100,7 +101,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("api request", apiName + "  response::::" + error.getMessage());
+                Tracer.error("api request", apiName + "  response::::" + error.getMessage());
                 networkResponseListener.onError(error.getMessage());
             }
         }) {
@@ -111,7 +112,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
                 if (headers != null && headers.size() > 0) {
                     Set<String> keySet = headers.keySet();
                     for (String key : keySet) {
-                        Log.e("api request", apiName + "  header::::" + key + "   " + headers.get(key));
+                        Tracer.error("api request", apiName + "  header::::" + key + "   " + headers.get(key));
                     }
                 }
 
