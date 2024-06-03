@@ -13,4 +13,14 @@
     <color name="gray">#757575</color>
     <color name="tab_bg">#f73267</color>
     <color name="green_color">#38AE04</color>
+
+    <color name="white_opycity_swenty_present">#CCDEDEDE</color>
+    <color name="white_opycity_sixty_present">#99DEDEDE</color>
+    <color name="black_transparent_30">#66000000</color>
+    <color name="line_color">#707070</color>
+    <color name="hint_color">#D92D2D2D</color>
+    <color name="hint_color_edit">#2D2D2D</color>
+    <color name="white_drak_opicity_swenty_present">#B3B4B4B4</color>
+    <color name="red">#FB0000</color>
+    <color name="app_color">#111312</color>
 </resources>

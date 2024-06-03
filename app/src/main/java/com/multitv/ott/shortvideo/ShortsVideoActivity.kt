@@ -3,43 +3,60 @@ package com.multitv.ott.shortvideo
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
+import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.view.animation.TranslateAnimation
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.OrientationHelper
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.ui.TimeBar
+import com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
 import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.video.VideoSize
-import com.jaeger.library.StatusBarUtil
+import com.multitv.ott.shortvideo.adapter.ShortsVideoAdapter
+import com.multitv.ott.shortvideo.appcontroller.ApplicationController
 import com.multitv.ott.shortvideo.databinding.ShortVideoLayoutBinding
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.OnViewPagerListener
 import com.multitv.ott.shortvideo.listener.ShareVideoListener
 import com.multitv.ott.shortvideo.model.AuthModel
+import com.multitv.ott.shortvideo.model.USerFollowData
+import com.multitv.ott.shortvideo.model.USerLikeData
+import com.multitv.ott.shortvideo.model.UserBehivourData
 import com.multitv.ott.shortvideo.network.CommonApiListener
 import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
 import com.multitv.ott.shortvideo.network.Json
+import com.multitv.ott.shortvideo.utils.CacheUttils
 import com.multitv.ott.shortvideo.utils.ScreenUtils
+import com.multitv.ott.shortvideo.utils.SharedPreference
 import com.multitv.ott.shortvideo.utils.Uttils
 import com.multitv.ott.shortvideo.utils.ViewPagerLayoutManager
 import com.multitv.ott.shortvideo.uttls.CommonUtils
@@ -51,6 +68,13 @@ import com.multitv.ott.shortvideo.uttls.PlayerConstant.BUFFER_FOR_PLAYBACK_AFTER
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.FORWARD_INCREMENT
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MAX_BUFFER_DURATION
 import com.multitv.ott.shortvideo.uttls.PlayerConstant.MIN_BUFFER_DURATION
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+
 
 class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoListener {
 
@@ -59,7 +83,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private var shortsVideoAdapter: ShortsVideoAdapter? = null
 
     private var endPointContentListUrl =
-        "/device/android/current_offset/0/max_counter/100/cat_id/3437"
+        "https://expo.multitvsolution.com/api/v6/content/list/token/15zh353kd4dese/device/android/current_offset/0/max_counter/100/cat_id/3437"
 
     private var authUrl =
         "https://expo.multitvsolution.com/api/v6/get/validate/token/package_id/12/token/15zh353kd4dese"
@@ -71,6 +95,14 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private lateinit var videoImageView: ImageView
     private lateinit var videoPauseButton: ImageView
     private lateinit var videoPlayButton: ImageView
+    private lateinit var bookmarkImageView: ImageView
+
+    private lateinit var muteButton: ImageView
+    private lateinit var unmuteButton: ImageView
+    private lateinit var exo_position: TextView
+    private lateinit var likeImageView: ImageView
+
+
     private var music01: ImageView? = null
     private var music02: ImageView? = null
     private var ivSoundTrack_HomeFragLay: ImageView? = null
@@ -88,13 +120,74 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
 
     private lateinit var binding: ShortVideoLayoutBinding
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StatusBarUtil.setTransparent(this)
+        //StatusBarUtil.setTransparent(this)
         binding = DataBindingUtil.setContentView(this, R.layout.short_video_layout)
         //  vaildationTokenRequest = intent?.getStringExtra(Uttils.TOKEN)
 
-        authenticationToken()
+        //authenticationToken()
+
+        layoutManager = ViewPagerLayoutManager(this@ShortsVideoActivity, OrientationHelper.VERTICAL)
+        layoutManager?.initialPrefetchItemCount = 3
+        binding.tictocRecyclerview.setItemViewCacheSize(20)
+        layoutManager?.setExtraLayoutSpace(ScreenUtils.getScreenHeight(this@ShortsVideoActivity))
+        binding.tictocRecyclerview.layoutManager = layoutManager
+        binding.tictocRecyclerview.isNestedScrollingEnabled = true
+
+        shortsVideoAdapter = ShortsVideoAdapter(
+            this@ShortsVideoActivity,
+            contentHomeList,
+            binding.tictocRecyclerview,
+            this@ShortsVideoActivity,
+            this@ShortsVideoActivity
+        )
+        binding.tictocRecyclerview.adapter = shortsVideoAdapter
+
+
+        val homeData = CacheUttils.getHomeCacheData()
+        if (homeData != null && homeData.result != null && homeData.result.content != null && homeData.result.content.size > 0) {
+            binding.loadMoreProgressbar.visibility = View.GONE
+            binding.centerProgressbar.visibility = View.GONE
+            contentHomeList.addAll(homeData.result.content)
+            if (contentHomeList.size != 0) {
+                binding.tictocRecyclerview.visibility = View.VISIBLE
+                binding.contentInfoNotFoundTV.visibility = View.GONE
+                shortsVideoAdapter?.notifyDataSetChanged()
+                binding.tictocRecyclerview.scrollToPosition(0)
+            } else {
+                binding.tictocRecyclerview.visibility = View.GONE
+                binding.contentInfoNotFoundTV.visibility = View.VISIBLE
+                getVideoDetailsData(false)
+            }
+        } else {
+            getVideoDetailsData(false)
+        }
+
+        layoutManager?.setOnViewPagerListener(object : OnViewPagerListener {
+            override fun onInitComplete() {
+                setVideoPlayer(mCurPos)
+            }
+
+            override fun onPageRelease(isNext: Boolean, position: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int, isBottom: Boolean) {
+
+                if (mCurPos == position) return
+
+                setVideoPlayer(position)
+
+            }
+
+            override fun loadImageNextPerviousItem(isNext: Boolean, position: Int) {
+
+            }
+
+        })
     }
 
     private fun authenticationToken() {
@@ -118,13 +211,13 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
                     binding.tictocRecyclerview.layoutManager = layoutManager
                     binding.tictocRecyclerview.isNestedScrollingEnabled = true
 
-                    shortsVideoAdapter =
-                        ShortsVideoAdapter(
-                            this@ShortsVideoActivity,
-                            contentHomeList,
-                            binding.tictocRecyclerview,
-                            this@ShortsVideoActivity, this@ShortsVideoActivity
-                        )
+                    shortsVideoAdapter = ShortsVideoAdapter(
+                        this@ShortsVideoActivity,
+                        contentHomeList,
+                        binding.tictocRecyclerview,
+                        this@ShortsVideoActivity,
+                        this@ShortsVideoActivity
+                    )
                     binding.tictocRecyclerview.adapter = shortsVideoAdapter
 
                     getVideoDetailsData(false)
@@ -154,9 +247,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
                 } else {
                     Toast.makeText(
-                        this@ShortsVideoActivity,
-                        Uttils.INVAILD_USER,
-                        Toast.LENGTH_SHORT
+                        this@ShortsVideoActivity, Uttils.INVAILD_USER, Toast.LENGTH_SHORT
                     ).show()
                     finish()
                 }
@@ -165,9 +256,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             override fun onError(message: String?) {
                 binding.loadMoreProgressbar.visibility = View.GONE
                 Toast.makeText(
-                    this@ShortsVideoActivity,
-                    Uttils.INVAILD_USER,
-                    Toast.LENGTH_SHORT
+                    this@ShortsVideoActivity, Uttils.INVAILD_USER, Toast.LENGTH_SHORT
                 ).show()
                 finish()
             }
@@ -178,16 +267,13 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
 
     private fun getVideoDetailsData(isLoadMoreVideo: Boolean) {
-        if (isLoadMoreVideo)
-            binding.loadMoreProgressbar.visibility = View.VISIBLE
-        else
-            binding.centerProgressbar.visibility = View.VISIBLE
+        if (isLoadMoreVideo) binding.loadMoreProgressbar.visibility = View.VISIBLE
+        else binding.centerProgressbar.visibility = View.VISIBLE
 
         val header = HashMap<String, String>()
         val params = HashMap<String, String>()
 
-        var contentListUrl =
-            authModel.masterUrls?.contentList + "15zh353kd4dese" + endPointContentListUrl
+        var contentListUrl = endPointContentListUrl
 
         CommonApiPresenterImpl(object : CommonApiListener {
             @SuppressLint("NotifyDataSetChanged")
@@ -217,43 +303,342 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     }
 
+    private fun userBehivourRequest() {
+        val header = HashMap<String, String>()
+        val params = HashMap<String, String>()
+        val userId = SharedPreference().getPreferenceString(this, "user_id")
+
+        val url =
+            "https://expo.multitvsolution.com/api/v6/content/behavior/token/15zh353kd4dese/u_id/" + userId.toString() + "/c_id/" + contentHomeList.get(
+                mCurPos
+            ).id.toString() + "/p_id/" + contentHomeList.get(mCurPos).userId
+
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String) {
+                Log.e("Vikram:::", response)
+                val userBehivourData =
+                    Json.parse(response, UserBehivourData::class.java) as UserBehivourData
+
+                if (userBehivourData.code == 1) {
+                    if (userBehivourData.result?.isLike == 1) {
+                        likeImageView.setImageResource(R.drawable.like)
+                        isFavourite = 0
+                    } else {
+                        likeImageView.setImageResource(R.drawable.unlike)
+                        isFavourite = 1
+
+                    }
+
+                    if (userBehivourData.result?.isFavorite == 1) {
+                        bookmarkImageView.setImageResource(R.drawable.bokkmark_selected)
+                        isWatchlist = 0
+                    } else {
+                        bookmarkImageView.setImageResource(R.drawable.bokkmark_unselected)
+                        isWatchlist = 1
+                    }
+
+                    if (userBehivourData.result!!.isFollow == 1) {
+                        followButton.setText("Unfollow")
+                        isFollow = 0
+                    } else {
+                        isFollow = 1
+                        followButton.setText("Follow")
+                    }
+                }
+
+
+            }
+
+            override fun onError(message: String?) {
+            }
+
+        }).getRequest(
+            url, "Login", header
+        )
+    }
+
+    private var isFavourite = 0
+    private var isFollow = 0
+    private var isWatchlist = 0
+
+
+    private fun bookMarkAPiRequest() {
+        val header = HashMap<String, String>()
+        val params = HashMap<String, String>()
+        val userId = SharedPreference().getPreferenceString(this, "user_id")
+        val userName = SharedPreference().getPreferenceString(this, "user_info")
+        params["u_id"] = userId.toString()
+        params["c_id"] = contentHomeList.get(mCurPos).id.toString()
+        params["tp"] = "favorite"
+
+        params["u_name"] = userName.toString()
+        params["c_name"] = "short videos"
+
+        params["st"] = "" + isWatchlist
+
+        //var contentListUrl=authModel.masterUrls.
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String) {
+                Log.e("Vikram:::", response)
+
+                val userBehivourData =
+                    Json.parse(response, USerLikeData::class.java) as USerLikeData
+
+                if (userBehivourData.code == 1) {
+                    if (userBehivourData.action.equals("1")) {
+                        isWatchlist = 0
+                        bookmarkImageView.setImageResource(R.drawable.bokkmark_selected)
+                    } else {
+                        isWatchlist = 1
+                        bookmarkImageView.setImageResource(R.drawable.bokkmark_unselected)
+                    }
+                } else {
+                    Toast.makeText(
+                        this@ShortsVideoActivity,
+                        "Something went wrong , please try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
+            }
+
+            override fun onError(message: String?) {
+                Toast.makeText(
+                    this@ShortsVideoActivity,
+                    "Something went wrong , please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }).postRequest(
+            "https://expo.multitvsolution.com/api/v6/user/behavior_post/token/15zh353kd4dese/device/web",
+            "Favourite",
+            params,
+            header
+        )
+    }
+
+
+    private fun likeApiRequest() {
+        val header = HashMap<String, String>()
+        val params = HashMap<String, String>()
+        val userId = SharedPreference().getPreferenceString(this, "user_id")
+        val userName = SharedPreference().getPreferenceString(this, "user_info")
+        params["u_id"] = userId.toString()
+        params["c_id"] = contentHomeList.get(mCurPos).id.toString()
+        params["tp"] = "like"
+
+        params["u_name"] = userName.toString()
+        params["c_name"] = "short videos"
+
+        params["st"] = "" + isFavourite
+
+
+        //var contentListUrl=authModel.masterUrls.
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String) {
+                Log.e("Vikram:::", response)
+
+                val userBehivourData =
+                    Json.parse(response, USerLikeData::class.java) as USerLikeData
+
+                if (userBehivourData.code == 1) {
+                    if (userBehivourData.action.equals("1")) {
+                        likeImageView.setImageResource(R.drawable.like)
+                        isFavourite = 0
+                    } else {
+                        likeImageView.setImageResource(R.drawable.unlike)
+                        isFavourite = 1
+                    }
+
+                } else {
+                    Toast.makeText(
+                        this@ShortsVideoActivity,
+                        "Something went wrong , please try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
+            }
+
+            override fun onError(message: String?) {
+                Toast.makeText(
+                    this@ShortsVideoActivity,
+                    "Something went wrong , please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }).postRequest(
+            "https://expo.multitvsolution.com/api/v6/user/behavior_post/token/15zh353kd4dese/device/web",
+            "Like",
+            params,
+            header
+        )
+    }
+
+    private fun folowApiRequest() {
+        val header = HashMap<String, String>()
+        val params = HashMap<String, String>()
+        val userId = SharedPreference().getPreferenceString(this, "user_id")
+        val userName = SharedPreference().getPreferenceString(this, "user_info")
+        params["u_id"] = userId.toString()
+        params["f_id"] = contentHomeList.get(mCurPos).userId.toString()
+        params["st"] = "" + isFollow
+
+        //var contentListUrl=authModel.masterUrls.
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String) {
+                Log.e("Vikram:::", response)
+
+
+                val jsonObj = JSONObject(response)
+
+                if (jsonObj.optString("action").equals("0")) {
+                    followButton.setText("Follow")
+                    isFollow = 1
+                } else {
+                    followButton.setText("UnFollow")
+                    isFollow = 0
+                }
+
+
+            }
+
+            override fun onError(message: String?) {
+                Toast.makeText(
+                    this@ShortsVideoActivity,
+                    "Something went wrong , please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }).postRequest(
+            "https://expo.multitvsolution.com/api/v6/user/follow/token/15zh353kd4dese/device/web",
+            "Follow",
+            params,
+            header
+        )
+    }
+
+    private lateinit var followButton: TextView
+    private lateinit var httpDataSourceFactory: HttpDataSource.Factory
+    private lateinit var defaultDataSourceFactory: DefaultDataSourceFactory
+    private lateinit var cacheDataSourceFactory: DataSource.Factory
+    private val simpleCache: SimpleCache = ApplicationController.simpleCache
+
     private fun setVideoPlayer(position: Int) {
         releaseVideoPlayer()
         binding.loadMoreProgressbar.visibility = View.VISIBLE
 
         val findViewByPosition = layoutManager?.findViewByPosition(position)
 
-        styledPlayerView =
-            findViewByPosition?.findViewById(R.id.playerView) as StyledPlayerView
-        videoImageView =
-            findViewByPosition.findViewById(R.id.videoImageView) as ImageView
+        styledPlayerView = findViewByPosition?.findViewById(R.id.playerView) as StyledPlayerView
+        videoImageView = findViewByPosition.findViewById(R.id.videoImageView) as ImageView
 
-        videoPauseButton =
-            findViewByPosition.findViewById(R.id.exo_pause) as ImageView
+        videoPauseButton = findViewByPosition.findViewById(R.id.playButton) as ImageView
 
-        videoPlayButton =
-            findViewByPosition.findViewById(R.id.exo_play) as ImageView
+        videoPlayButton = findViewByPosition.findViewById(R.id.pauseButton) as ImageView
+
+        val timeBar = findViewByPosition.findViewById(R.id.exo_progress) as DefaultTimeBar
+
+        muteButton = findViewByPosition.findViewById(R.id.muteButton) as ImageView
+
+        unmuteButton = findViewByPosition.findViewById(R.id.unmuteButton) as ImageView
+
+        exo_position = findViewByPosition.findViewById(R.id.exo_position) as TextView
+
+        followButton = findViewByPosition.findViewById(R.id.followButton) as TextView
+        likeImageView = findViewByPosition.findViewById(R.id.likeImageView) as ImageView
+
+        bookmarkImageView = findViewByPosition.findViewById(R.id.bookmarkImageView) as ImageView
+
+        val backButton = findViewByPosition.findViewById(R.id.backButton) as ImageView
+
+        backButton.setOnClickListener {
+            finish()
+        }
+
+        likeImageView.setOnClickListener {
+            val userData = SharedPreference().getPreferenceString(this, "user_id")
+
+            if (!userData.isNullOrEmpty()) {
+                likeApiRequest()
+            } else {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        bookmarkImageView.setOnClickListener {
+            val userData = SharedPreference().getPreferenceString(this, "user_id")
+
+            if (!userData.isNullOrEmpty()) {
+                bookMarkAPiRequest()
+            } else {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        followButton.setOnClickListener {
+            val userData = SharedPreference().getPreferenceString(this, "user_id")
+
+            if (!userData.isNullOrEmpty()) {
+                folowApiRequest()
+            } else {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
         videoPlayButton.setOnClickListener {
             videoPlayButton.visibility = View.GONE
             videoPauseButton.visibility = View.VISIBLE
-            mediaPlayer?.playWhenReady = true
+            mediaPlayer?.playWhenReady = false
         }
 
         videoPauseButton.setOnClickListener {
             videoPlayButton.visibility = View.VISIBLE
             videoPauseButton.visibility = View.GONE
-            mediaPlayer?.playWhenReady = false
+            mediaPlayer?.playWhenReady = true
         }
 
 
+        unmuteButton.setOnClickListener {
+            mediaPlayer?.audioComponent?.volume = 0f
+            muteButton.visibility = View.VISIBLE
+            unmuteButton.visibility = View.GONE
+        }
+
+
+        muteButton.setOnClickListener {
+            val maxVolume = audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 100
+            mediaPlayer?.audioComponent?.volume = 5f
+
+            muteButton.visibility = View.GONE
+            unmuteButton.visibility = View.VISIBLE
+        }
+
+
+        videoPlayButton.visibility = View.VISIBLE
         videoImageView.visibility = View.VISIBLE
         val imageUrl = contentHomeList[position].thumbs?.get(0)?.thumb?.large
 
+
+
         if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(this@ShortsVideoActivity)
-                .load(imageUrl)
-                .error(R.color.black)
+            Glide.with(this@ShortsVideoActivity).load(imageUrl).error(R.color.black)
                 .into(videoImageView)
         }
 
@@ -265,12 +650,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
         callFirstAnimation()
         val rotate = RotateAnimation(
-            0f,
-            360f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f
+            0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
         )
         rotate.duration = 5000
         rotate.repeatCount = Animation.INFINITE
@@ -295,6 +675,22 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         }
 
         releaseVideoPlayer()
+
+        val mediaItem = getMediaItem(
+            contentHomeList.get(position).url.toString()
+        )
+        httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+
+        defaultDataSourceFactory = DefaultDataSourceFactory(
+            this, httpDataSourceFactory
+        )
+
+        cacheDataSourceFactory = CacheDataSource.Factory()
+            .setCache(simpleCache)
+            .setUpstreamDataSourceFactory(httpDataSourceFactory)
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+
         val customLoadControl = getCustomLoadControl()
         mediaPlayer = getMediaPLayerInstance(customLoadControl, trackSelector!!, videoAdsUrl)
         mediaPlayer?.addListener(playerStateListener)
@@ -303,40 +699,157 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         styledPlayerView.keepScreenOn = true
         styledPlayerView.useController = false
         styledPlayerView.setControllerHideDuringAds(true)
-        //val isDrm = isDrmContent(videoUrl)
-        val mediaItem = getMediaItem(
-            contentHomeList.get(position).url.toString()
-        )
-        mediaPlayer?.setMediaItem(mediaItem)
+
+
+        val hlsMediaSource = HlsMediaSource.Factory(cacheDataSourceFactory)
+            .createMediaSource(mediaItem)
+        mediaPlayer?.setMediaSource(hlsMediaSource)
         mediaPlayer?.repeatMode = Player.REPEAT_MODE_ONE
         mediaPlayer?.prepare()
         mediaPlayer?.playWhenReady = true
         updatePlayPauseButton()
 
+        startUpdates(timeBar)
         mCurPos = position
+
+        val userData = SharedPreference().getPreferenceString(this, "user_id")
+
+        if (!userData.isNullOrEmpty()) {
+            userBehivourRequest()
+        }
+
+
+        val volume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) as Int
+
+        if (volume <= 1) {
+            muteButton.visibility = View.VISIBLE
+            unmuteButton.visibility = View.GONE
+        } else {
+            muteButton.visibility = View.GONE
+            unmuteButton.visibility = View.VISIBLE
+        }
     }
 
-    private fun updatePlayPauseButton() {
-        var requestPlayPauseFocus = false
-        val playing = mediaPlayer != null && mediaPlayer!!.playWhenReady
-        requestPlayPauseFocus =
-            requestPlayPauseFocus or (playing && videoPlayButton.isFocused)
-        videoPlayButton.visibility = if (playing) FrameLayout.GONE else FrameLayout.VISIBLE
-        requestPlayPauseFocus =
-            requestPlayPauseFocus or (!playing && videoPauseButton.isFocused)
-        videoPauseButton.visibility = if (!playing) FrameLayout.GONE else FrameLayout.VISIBLE
-        if (requestPlayPauseFocus) {
-            requestPlayPauseFocus()
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (event.keyCode === KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (styledPlayerView.visibility == View.VISIBLE) {
+                val volume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) as Int
+                if (volume <= 1) {
+                    muteButton.visibility = View.VISIBLE
+                    unmuteButton.visibility = View.GONE
+                } else {
+                    muteButton.visibility = View.GONE
+                    unmuteButton.visibility = View.VISIBLE
+                }
+            }
         }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (event.keyCode === KeyEvent.KEYCODE_VOLUME_UP) {
+            if (styledPlayerView.visibility == View.VISIBLE) {
+                val volume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) as Int
+                if (volume <= 1) {
+                    muteButton.visibility = View.VISIBLE
+                    unmuteButton.visibility = View.GONE
+                } else {
+                    muteButton.visibility = View.GONE
+                    unmuteButton.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        return super.onKeyUp(keyCode, event)
+    }
+
+    private var ambientModeJob: Job? = null
+
+
+    private fun startUpdates(timeBar: DefaultTimeBar) {
+        stopUpdates()
+        ambientModeJob = lifecycleScope.launch {
+            while (true) {
+                withContext(Dispatchers.Main) {
+                    timeBar.setPosition(mediaPlayer?.currentPosition as Long)
+                    exo_position.text = getAndDisplayDuration()
+                    updateTimeBarProgress(timeBar)
+                }
+                delay(1000)
+            }
+        }
+    }
+
+    private fun getAndDisplayDuration(): String {
+        val durationMs: Long = mediaPlayer?.currentPosition as Long
+        val durationFormatted: String = formatDuration(durationMs)
+        return durationFormatted
+    }
+
+    private fun formatDuration(durationMs: Long): String {
+        val totalSeconds = (durationMs / 1000).toInt()
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return String.format("%02d:%02d", minutes, seconds)
+    }
+
+
+    private fun stopUpdates() {
+        ambientModeJob?.cancel()
+        ambientModeJob = null
+    }
+
+    private fun updateTimeBarProgress(timeBar: DefaultTimeBar) {
+        mediaPlayer?.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == ExoPlayer.STATE_READY) {
+                    timeBar.setDuration(mediaPlayer!!.getDuration())
+                }
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    timeBar.setPosition(mediaPlayer!!.getCurrentPosition())
+                }
+            }
+        })
+
+        timeBar.addListener(object : OnScrubListener {
+            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                // Handle scrub start
+            }
+
+            override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                // Handle scrub move
+                mediaPlayer?.seekTo(position)
+            }
+
+            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
+                // Handle scrub stop
+                mediaPlayer?.seekTo(position)
+            }
+        })
+    }
+
+    private fun updatePlayPauseButton() {/* var requestPlayPauseFocus = false
+         val playing = mediaPlayer != null && mediaPlayer!!.playWhenReady
+         requestPlayPauseFocus =
+             requestPlayPauseFocus or (playing && videoPlayButton.isFocused)
+         videoPlayButton.visibility = if (playing) FrameLayout.GONE else FrameLayout.VISIBLE
+         requestPlayPauseFocus =
+             requestPlayPauseFocus or (!playing && videoPauseButton.isFocused)
+         videoPauseButton.visibility = if (!playing) FrameLayout.GONE else FrameLayout.VISIBLE
+         if (requestPlayPauseFocus) {
+             requestPlayPauseFocus()
+         }*/
     }
 
 
     private fun requestPlayPauseFocus() {
         val playing = mediaPlayer != null && mediaPlayer!!.playWhenReady
-        if (!playing)
-            videoPlayButton.requestFocus()
-        else
-            videoPauseButton.requestFocus()
+        if (!playing) videoPlayButton.requestFocus()
+        else videoPauseButton.requestFocus()
 
     }
 
@@ -383,10 +896,10 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         override fun onVideoSizeChanged(videoSize: VideoSize) {
             super.onVideoSizeChanged(videoSize)
 
-            if (videoSize.width > videoSize.height)
-                styledPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT)
-            else
-                styledPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL)
+            if (videoSize.width > videoSize.height) styledPlayerView.setResizeMode(
+                AspectRatioFrameLayout.RESIZE_MODE_FIT
+            )
+            else styledPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL)
 
 
         }
@@ -436,8 +949,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         videoUrl: String
     ): MediaItem {
 
-        val mediaItemBuilder = MediaItem.Builder()
-            .setUri(videoUrl)
+        val mediaItemBuilder = MediaItem.Builder().setUri(videoUrl)
             .setMediaMetadata(MediaMetadata.Builder().setTitle("MultiTv").build())
 
 //        if (drm && !drmLicenseUrl.isNullOrEmpty()) {
@@ -457,30 +969,26 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     private fun getCustomLoadControl(): LoadControl {
 
-        return DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                MIN_BUFFER_DURATION, MAX_BUFFER_DURATION,
-                BUFFER_FOR_PLAYBACK, BUFFER_FOR_PLAYBACK_AFTER_RE_BUFFER
-            )
-            .setAllocator(DefaultAllocator(true, ALLOCATION_SIZE))
-            .setBackBuffer(BACK_BUFFER_DURATION, false)
-            .setPrioritizeTimeOverSizeThresholds(true)
-            .setTargetBufferBytes(C.LENGTH_UNSET)
-            .build()
+        return DefaultLoadControl.Builder().setBufferDurationsMs(
+            MIN_BUFFER_DURATION,
+            MAX_BUFFER_DURATION,
+            BUFFER_FOR_PLAYBACK,
+            BUFFER_FOR_PLAYBACK_AFTER_RE_BUFFER
+        ).setAllocator(DefaultAllocator(true, ALLOCATION_SIZE))
+            .setBackBuffer(BACK_BUFFER_DURATION, false).setPrioritizeTimeOverSizeThresholds(true)
+            .setTargetBufferBytes(C.LENGTH_UNSET).build()
 
     }
 
     private fun getMediaPLayerInstance(
-        customLoadControl: LoadControl,
-        trackSelector: TrackSelector, adsUrl: String?
+        customLoadControl: LoadControl, trackSelector: TrackSelector, adsUrl: String?
     ): ExoPlayer {
 
         return ExoPlayer.Builder(this)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
             .setLoadControl(customLoadControl)
-            .setTrackSelector(trackSelector)
-            .setSeekForwardIncrementMs(seekForwardIncrementMs)
-            .setSeekBackIncrementMs(seekBackIncrementMs)
-            .build()
+            .setTrackSelector(trackSelector).setSeekForwardIncrementMs(seekForwardIncrementMs)
+            .setSeekBackIncrementMs(seekBackIncrementMs).build()
 
     }
 
@@ -545,6 +1053,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     override fun onDestroy() {
         super.onDestroy()
         releaseVideoPlayer()
+        stopUpdates()
     }
 
     override fun onResume() {

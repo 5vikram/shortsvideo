@@ -9,6 +9,9 @@ pluginManagement {
              url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
          }*/
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
+        }
     }
 }
 dependencyResolutionManagement {
@@ -22,6 +25,9 @@ dependencyResolutionManagement {
              url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
          }*/
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
+        }
     }
 }
 rootProject.name = "shortvideo"

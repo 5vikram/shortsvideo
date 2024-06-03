@@ -26,13 +26,11 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
 
         Tracer.error("Api Request::::", apiName + "  url::::" + url);
 
-        StringRequest jsonObjReq = new StringRequest(Request.Method.POST,
-                url, new Response.Listener<String>() {
+        StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
                 try {
-
                     Tracer.error("Api Request::::", apiName + "  response::::" + response);
                     networkResponseListener.onSuccess(response);
 
@@ -84,8 +82,7 @@ public class CommonApiPresenterImpl implements CommonApiPresenter {
 
     @Override
     public void getRequest(String url, String apiName, Map<String, String> headers) {
-        StringRequest jsonObjReq = new StringRequest(Request.Method.GET,
-                url, new Response.Listener<String>() {
+        StringRequest jsonObjReq = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {

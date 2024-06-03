@@ -29,5 +29,6 @@ object PlayerConstant {
     const val SPEED_CONTROLLER_KEY = "speed_params"
     const val SUBTITLE_SELECTION_KEY = "subtitle_selection"
     const val VOLUME_STATUS = "volume_status"
-
+    const val VIDEO_LIST = "VIDEO_LIST"
+    const val VIDEO_URL = "VIDEO_URL"
 }
