@@ -133,7 +133,7 @@ class EmailFreagment : Fragment() {
                 } else {
                     Toast.makeText(
                         activity,
-                        "Something went wrong , please try again.",
+                        "Please enter a vaild email address.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

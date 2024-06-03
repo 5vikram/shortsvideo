@@ -73,6 +73,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONException
 import org.json.JSONObject
 
 
@@ -178,6 +179,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             override fun onPageSelected(position: Int, isBottom: Boolean) {
 
                 if (mCurPos == position) return
+
+                analaticsApiRequest()
 
                 setVideoPlayer(position)
 
@@ -1067,6 +1070,78 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     override fun shareVideo(shareUrl: String) {
         CommonUtils().shareIntent(shareUrl, this)
+    }
+
+
+    private fun analaticsApiRequest() {
+        val header = HashMap<String, String>()
+        val params = HashMap<String, String>()
+        val userId = SharedPreference().getPreferenceString(this, "user_id")
+        val userName = SharedPreference().getPreferenceString(this, "user_info")
+        params["u_id"] = userId.toString()
+        params["c_id"] = contentHomeList.get(mCurPos).id.toString()
+        params["customer_name"] = userName.toString()
+        params["content_title"] = "short videos"
+        params["country"] = "india"
+        params["country_code"] = "IN"
+        params["age_group"] = "18"
+        params["gender"] = "male"
+        params["type"] = "video"
+        params["total_duration"] = "" + styledPlayerView.player?.duration
+        params["pd"] = "" + styledPlayerView.player?.currentPosition
+
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("make_model", "Chrome")
+            jsonObject.put("os", "android")
+            jsonObject.put("screen_resolution", "1848*543")
+            jsonObject.put("push_device_token", "")
+            jsonObject.put("device_type", "phone")
+            jsonObject.put("platform", "android")
+            jsonObject.put("device_unique_id", "222aa2750a651f277cfd271409a54836")
+            jsonObject.put("one_signal_id", "fdih543f7dsgv3")
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+
+        val locationPbj = JSONObject()
+        try {
+            locationPbj.put("loc_country", "India")
+            locationPbj.put("city", "Gaya")
+            locationPbj.put("loc_state", "Bihar")
+            locationPbj.put("ip", "2409:408a:2c9a:1159:43e5:5674:f9e6:e1de")
+            locationPbj.put("lat", "24.7935")
+            locationPbj.put("long", "85.012")
+            locationPbj.put("pincode", "823002")
+            locationPbj.put("isp", "Reliance Jio Infocomm Limited")
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        params["dd"] = jsonObject.toString()
+        params["location"] = locationPbj.toString()
+
+
+        //var contentListUrl=authModel.masterUrls.
+
+        CommonApiPresenterImpl(object : CommonApiListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSuccess(response: String) {
+                Log.e("Analatics:::", response)
+            }
+
+            override fun onError(message: String) {
+                Log.e("Analatics Error:::", message)
+            }
+
+        }).postRequest(
+            "https://expo.multitvsolution.com/api/v6/analyticapi/analytics-data/token/15zh353kd4dese",
+            "analatics",
+            params,
+            header
+        )
     }
 
 

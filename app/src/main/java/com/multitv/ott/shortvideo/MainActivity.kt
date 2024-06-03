@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             @SuppressLint("NotifyDataSetChanged")
             override fun onSuccess(response: String?) {
                 val home = Json.parse(response, ShortVideo::class.java) as ShortVideo
-
+                ApplicationController.getInstance().refershHomeData()
                 ApplicationController.getInstance().getCacheManager()
                     ?.put("Home", home)
 

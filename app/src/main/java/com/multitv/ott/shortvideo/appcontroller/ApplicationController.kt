@@ -18,6 +18,7 @@ import com.multitv.ott.shortvideo.utils.NukeSSLCerts
 import com.multitv.ott.shortvideo.utils.Tracer
 import com.multitv.ott.shortvideo.utils.Uttils
 import java.io.File
+import java.util.Objects
 
 class ApplicationController : MultiDexApplication() {
 
@@ -40,6 +41,14 @@ class ApplicationController : MultiDexApplication() {
             }
         }
         return cacheManager
+    }
+
+    fun refershHomeData() {
+        val key = "Home"
+        Objects.requireNonNull(
+            Objects.requireNonNull(getInstance())
+                .getCacheManager()
+        )?.put(key, null)
     }
 
     companion object {

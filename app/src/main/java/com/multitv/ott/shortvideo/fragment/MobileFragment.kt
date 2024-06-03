@@ -130,7 +130,7 @@ class MobileFragment : Fragment() {
                 } else {
                     Toast.makeText(
                         activity,
-                        "Something went wrong , please try again.",
+                        "Please enter a vaild mobile number",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
