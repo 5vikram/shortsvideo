@@ -79,11 +79,11 @@ class CommonUtils {
     }
 
 
-    fun shareIntent(body: String, context: Context?) {
+    fun shareIntent(shareUrl: String, context: Context?) {
         val shareIntent = Intent()
         shareIntent.action = Intent.ACTION_SEND
         shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_TEXT, body)
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareUrl)
         context?.startActivity(
             Intent.createChooser(
                 shareIntent,

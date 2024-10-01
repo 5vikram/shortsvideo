@@ -1,6 +1,7 @@
 package com.multitv.ott.shortvideo
 
 import com.google.gson.annotations.SerializedName
+import com.multitv.ott.shortvideo.vikrammodel.Vikram
 
 data class ShortVideo(
 
@@ -85,6 +86,9 @@ data class ContentItem(
     @field:SerializedName("sku")
     val sku: List<SkuItem>? = null,
 
+    @SerializedName("layout_thumbs")
+    var layoutThumbs: List<LayoutThumb>,
+
     @field:SerializedName("first_name")
     val firstName: String? = null,
 
@@ -127,6 +131,26 @@ data class ContentItem(
     @field:SerializedName("thumbs")
     val thumbs: List<ThumbsItem?>? = null
 )
+
+data class LayoutThumb(
+    @SerializedName("id")
+    var id: String?,
+    @SerializedName("image_size")
+    var imageSize: List<ImageSize>,
+    @SerializedName("layout")
+    var layout: String?
+) {
+    data class ImageSize(
+        @SerializedName("height")
+        var height: String?,
+        @SerializedName("identifier")
+        var identifier: String?,
+        @SerializedName("url")
+        var url: String?,
+        @SerializedName("width")
+        var width: String?
+    )
+}
 
 data class ThumbsItem(
 

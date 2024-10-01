@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -25,10 +27,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.OrientationHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
@@ -48,13 +50,12 @@ import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.OnViewPagerListener
 import com.multitv.ott.shortvideo.listener.ShareVideoListener
 import com.multitv.ott.shortvideo.model.AuthModel
-import com.multitv.ott.shortvideo.model.USerFollowData
 import com.multitv.ott.shortvideo.model.USerLikeData
-import com.multitv.ott.shortvideo.model.UserBehivourData
 import com.multitv.ott.shortvideo.network.CommonApiListener
 import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
 import com.multitv.ott.shortvideo.network.Json
 import com.multitv.ott.shortvideo.utils.CacheUttils
+import com.multitv.ott.shortvideo.utils.CountDownTimerWithPause
 import com.multitv.ott.shortvideo.utils.ScreenUtils
 import com.multitv.ott.shortvideo.utils.SharedPreference
 import com.multitv.ott.shortvideo.utils.Uttils
@@ -75,6 +76,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.TimeUnit
 
 
 class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoListener {
@@ -84,7 +88,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private var shortsVideoAdapter: ShortsVideoAdapter? = null
 
     private var endPointContentListUrl =
-        "https://expo.multitvsolution.com/api/v6/content/list/token/15zh353kd4dese/device/android/current_offset/0/max_counter/100/cat_id/3437"
+        "https://expo.multitvsolution.com/api/v6/content/list/token/66fa6b4ca3961/device/android/current_offset/0/max_counter/100/cat_id/5371"
 
     private var authUrl =
         "https://expo.multitvsolution.com/api/v6/get/validate/token/package_id/12/token/15zh353kd4dese"
@@ -97,6 +101,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private lateinit var videoPauseButton: ImageView
     private lateinit var videoPlayButton: ImageView
     private lateinit var bookmarkImageView: ImageView
+    private lateinit var contentAdapterRecyclerview: RecyclerView
+    private lateinit var timeBar: DefaultTimeBar
 
     private lateinit var muteButton: ImageView
     private lateinit var unmuteButton: ImageView
@@ -268,13 +274,16 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     }
 
+    private val token =
+        "abd07061a3dd9851e3c9dd551e68e26838b29e87b2baa479c0eb53c95cac2e6b9835d5a1b6b51c5dfb0febddf90338d925096a08fe746a6bd615205b5d1a29545d1b3c9fb826b9e787a6e8307c77423d"
+
 
     private fun getVideoDetailsData(isLoadMoreVideo: Boolean) {
         if (isLoadMoreVideo) binding.loadMoreProgressbar.visibility = View.VISIBLE
         else binding.centerProgressbar.visibility = View.VISIBLE
 
         val header = HashMap<String, String>()
-        val params = HashMap<String, String>()
+        header.put("authorization", token)
 
         var contentListUrl = endPointContentListUrl
 
@@ -306,7 +315,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     }
 
-    private fun userBehivourRequest() {
+    /*private fun userBehivourRequest() {
         val header = HashMap<String, String>()
         val params = HashMap<String, String>()
         val userId = SharedPreference().getPreferenceString(this, "user_id")
@@ -360,7 +369,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         }).getRequest(
             url, "Login", header
         )
-    }
+    }*/
 
     private var isFavourite = 0
     private var isFollow = 0
@@ -488,53 +497,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         )
     }
 
-    private fun folowApiRequest() {
-        val header = HashMap<String, String>()
-        val params = HashMap<String, String>()
-        val userId = SharedPreference().getPreferenceString(this, "user_id")
-        val userName = SharedPreference().getPreferenceString(this, "user_info")
-        params["u_id"] = userId.toString()
-        params["f_id"] = contentHomeList.get(mCurPos).userId.toString()
-        params["st"] = "" + isFollow
 
-        //var contentListUrl=authModel.masterUrls.
-
-        CommonApiPresenterImpl(object : CommonApiListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(response: String) {
-                Log.e("Vikram:::", response)
-
-
-                val jsonObj = JSONObject(response)
-
-                if (jsonObj.optString("action").equals("0")) {
-                    followButton.setText("Follow")
-                    isFollow = 1
-                } else {
-                    followButton.setText("UnFollow")
-                    isFollow = 0
-                }
-
-
-            }
-
-            override fun onError(message: String?) {
-                Toast.makeText(
-                    this@ShortsVideoActivity,
-                    "Something went wrong , please try again.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-        }).postRequest(
-            "https://expo.multitvsolution.com/api/v6/user/follow/token/15zh353kd4dese/device/web",
-            "Follow",
-            params,
-            header
-        )
-    }
-
-    private lateinit var followButton: TextView
     private lateinit var httpDataSourceFactory: HttpDataSource.Factory
     private lateinit var defaultDataSourceFactory: DefaultDataSourceFactory
     private lateinit var cacheDataSourceFactory: DataSource.Factory
@@ -542,6 +505,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     private fun setVideoPlayer(position: Int) {
         releaseVideoPlayer()
+        customAdBannerTimer?.cancel()
+        customAdBannerTimer?.onFinish()
         binding.loadMoreProgressbar.visibility = View.VISIBLE
 
         val findViewByPosition = layoutManager?.findViewByPosition(position)
@@ -553,15 +518,17 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
         videoPlayButton = findViewByPosition.findViewById(R.id.pauseButton) as ImageView
 
-        val timeBar = findViewByPosition.findViewById(R.id.exo_progress) as DefaultTimeBar
+        timeBar = findViewByPosition.findViewById(R.id.exo_progress) as DefaultTimeBar
 
         muteButton = findViewByPosition.findViewById(R.id.muteButton) as ImageView
 
         unmuteButton = findViewByPosition.findViewById(R.id.unmuteButton) as ImageView
 
+        contentAdapterRecyclerview =
+            findViewByPosition.findViewById(R.id.contentAdapterRecyclerview) as RecyclerView
+
         exo_position = findViewByPosition.findViewById(R.id.exo_position) as TextView
 
-        followButton = findViewByPosition.findViewById(R.id.followButton) as TextView
         likeImageView = findViewByPosition.findViewById(R.id.likeImageView) as ImageView
 
         bookmarkImageView = findViewByPosition.findViewById(R.id.bookmarkImageView) as ImageView
@@ -594,27 +561,20 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             }
         }
 
-        followButton.setOnClickListener {
-            val userData = SharedPreference().getPreferenceString(this, "user_id")
-
-            if (!userData.isNullOrEmpty()) {
-                folowApiRequest()
-            } else {
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
 
         videoPlayButton.setOnClickListener {
             videoPlayButton.visibility = View.GONE
             videoPauseButton.visibility = View.VISIBLE
             mediaPlayer?.playWhenReady = false
+            customAdBannerTimer?.pause()
+            showCatlogData()
         }
 
         videoPauseButton.setOnClickListener {
             videoPlayButton.visibility = View.VISIBLE
             videoPauseButton.visibility = View.GONE
             mediaPlayer?.playWhenReady = true
+            customAdBannerTimer?.resume()
         }
 
 
@@ -636,6 +596,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
         videoPlayButton.visibility = View.VISIBLE
         videoImageView.visibility = View.VISIBLE
+        styledPlayerView.visibility = View.GONE
         val imageUrl = contentHomeList[position].thumbs?.get(0)?.thumb?.large
 
 
@@ -682,17 +643,16 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         val mediaItem = getMediaItem(
             contentHomeList.get(position).url.toString()
         )
-        httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
+        httpDataSourceFactory = DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true)
 
         defaultDataSourceFactory = DefaultDataSourceFactory(
             this, httpDataSourceFactory
         )
 
-        cacheDataSourceFactory = CacheDataSource.Factory()
-            .setCache(simpleCache)
+        cacheDataSourceFactory = CacheDataSource.Factory().setCache(simpleCache)
             .setUpstreamDataSourceFactory(httpDataSourceFactory)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+
 
         val customLoadControl = getCustomLoadControl()
         mediaPlayer = getMediaPLayerInstance(customLoadControl, trackSelector!!, videoAdsUrl)
@@ -704,8 +664,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         styledPlayerView.setControllerHideDuringAds(true)
 
 
-        val hlsMediaSource = HlsMediaSource.Factory(cacheDataSourceFactory)
-            .createMediaSource(mediaItem)
+        val hlsMediaSource =
+            HlsMediaSource.Factory(cacheDataSourceFactory).createMediaSource(mediaItem)
         mediaPlayer?.setMediaSource(hlsMediaSource)
         mediaPlayer?.repeatMode = Player.REPEAT_MODE_ONE
         mediaPlayer?.prepare()
@@ -715,12 +675,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         startUpdates(timeBar)
         mCurPos = position
 
-        val userData = SharedPreference().getPreferenceString(this, "user_id")
-
-        if (!userData.isNullOrEmpty()) {
-            userBehivourRequest()
-        }
-
+        if (markerPositions.size > 0) markerPositions.clear()
 
         val volume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) as Int
 
@@ -856,17 +811,43 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     }
 
+    private var isCurrentVideoSuccessfullyLoad = false
+    private var markerPositions = ArrayList<Long>()
+
 
     private var playerStateListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(@Player.State playbackState: Int) {
             when (playbackState) {
 
                 Player.STATE_READY -> {
+                    if (markerPositions.size > 0) markerPositions.clear()
+
                     styledPlayerView.visibility = View.VISIBLE
                     videoImageView.visibility = View.GONE
                     binding.loadMoreProgressbar.visibility = View.GONE
                     // styledPlayerView.bringToFront()
                     styledPlayerView.useController = true
+
+
+                    val durationMs = mediaPlayer?.duration!!
+
+                    // Create marker positions every 1 minute (60,000 milliseconds)
+
+                    val markerCount = (durationMs / 60000)  // Number of 1-minute intervals
+
+                    for (i in 1..markerCount) {
+                        markerPositions.add(i * 60000L)  // 1 minute = 60,000ms
+                    }
+
+
+                    // Set these positions as ad group times
+                    val adGroupTimesMs = markerPositions.toLongArray()
+                    val adGroupCount = adGroupTimesMs.size
+                    val playedAdGroups = BooleanArray(adGroupCount) { false } // Markers as unplayed
+
+                    // Apply the markers to the time bar
+                    timeBar.setAdGroupTimesMs(adGroupTimesMs, playedAdGroups, adGroupCount)
+                    startCountDownTimer()
                 }
 
                 Player.STATE_IDLE -> {
@@ -883,6 +864,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
                 Player.STATE_ENDED -> {
                     mediaPlayer?.repeatMode = Player.REPEAT_MODE_ONE
+                    if (markerPositions.size > 0) markerPositions.clear()
                 }
             }
         }
@@ -896,6 +878,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             binding.loadMoreProgressbar.visibility = View.GONE
         }
 
+
         override fun onVideoSizeChanged(videoSize: VideoSize) {
             super.onVideoSizeChanged(videoSize)
 
@@ -904,10 +887,52 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             )
             else styledPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL)
 
-
+            styledPlayerView.visibility = View.VISIBLE
+            videoImageView.visibility = View.GONE
         }
 
     }
+
+
+    val timer = Timer()
+    val mainHandler = Handler(Looper.getMainLooper())
+    private var customAdBannerTimer: CountDownTimerWithPause? = null
+
+    private fun startCountDownTimer() {
+        customAdBannerTimer = object : CountDownTimerWithPause(
+            mediaPlayer!!.duration, (1000).toLong(), true
+        ) {
+            override fun onTick(millisUntilFinished: Long) {
+                val currentPositionMs = mediaPlayer?.currentPosition!!
+                val seconds = currentPositionMs / 1000
+
+                for (item in markerPositions.indices) {
+                    val pointerSecond = markerPositions.get(item) / 1000
+
+                    Log.e("PLAYER TIMER:::", ":::" + seconds)
+                    Log.e("pointer Second:::", ":::" + pointerSecond)
+                    if (pointerSecond == seconds) {
+                        showCatlogData()
+                        break
+                    }
+                }
+
+            }
+
+            override fun onFinish() {
+
+            }
+
+        }.create()
+    }
+
+    private fun showCatlogData() {
+        contentAdapterRecyclerview.visibility = View.VISIBLE
+        Handler(Looper.getMainLooper()).postDelayed({
+            contentAdapterRecyclerview.visibility = View.GONE
+        }, 15000)
+    }
+
 
     private fun checkForAudioFocus(): Boolean {
         // Request audio focus for playback
@@ -989,8 +1014,8 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
         return ExoPlayer.Builder(this)
             .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
-            .setLoadControl(customLoadControl)
-            .setTrackSelector(trackSelector).setSeekForwardIncrementMs(seekForwardIncrementMs)
+            .setLoadControl(customLoadControl).setTrackSelector(trackSelector)
+            .setSeekForwardIncrementMs(seekForwardIncrementMs)
             .setSeekBackIncrementMs(seekBackIncrementMs).build()
 
     }
@@ -1051,17 +1076,22 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     override fun onPause() {
         super.onPause()
         pauseVideoPlayer()
+        customAdBannerTimer?.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         releaseVideoPlayer()
         stopUpdates()
+
+        customAdBannerTimer?.cancel()
+        customAdBannerTimer?.onFinish()
     }
 
     override fun onResume() {
         super.onResume()
         resumeVideoPlayer()
+        customAdBannerTimer?.resume()
     }
 
     override fun onLoadMore() {

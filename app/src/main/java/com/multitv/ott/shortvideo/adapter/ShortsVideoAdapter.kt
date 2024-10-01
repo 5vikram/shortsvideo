@@ -86,9 +86,6 @@ class ShortsVideoAdapter(
             val contentAdapterRecyclerview =
                 playerLayout.findViewById<RecyclerView>(R.id.contentAdapterRecyclerview)
 
-            val profilePictureImageView =
-                playerLayout.findViewById<CircleImageView>(R.id.profilePictureImageView)
-
             if (contentHome.sku != null && contentHome.sku.size > 0) {
                 val linearLayoutManager = LinearLayoutManager(context)
                 linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
@@ -98,36 +95,33 @@ class ShortsVideoAdapter(
                     context, contentHome.sku
                 )
                 contentAdapterRecyclerview.setAdapter(homeContentAdapter)
-                contentAdapterRecyclerview.visibility = View.VISIBLE
+                //contentAdapterRecyclerview.visibility = View.VISIBLE
             } else {
                 contentAdapterRecyclerview.visibility = View.GONE
             }
 
             val videoTitleTv_new = playerLayout.findViewById<TextView>(R.id.videoTitleTv)
-            val descriptionTv_new = playerLayout.findViewById<TextView>(R.id.videoDescriptionTv)
             val viewCountTv = playerLayout.findViewById<TextView>(R.id.viewCountTv)
+            val videoImageView = playerLayout.findViewById<ImageView>(R.id.videoImageView)
 
-            if (contentHome.username != null && !TextUtils.isEmpty(contentHome.username)) {
-                videoTitleTv_new.text = contentHome.username
+            if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title)) {
+                videoTitleTv_new.text = contentHome.title
                 videoTitleTv_new.visibility = View.VISIBLE
             } else {
                 videoTitleTv_new.visibility = View.GONE
             }
 
-            if (contentHome.des != null && !TextUtils.isEmpty(contentHome.des)) {
-                descriptionTv_new.text = contentHome.des
-                descriptionTv_new.visibility = View.GONE
-            } else {
-                descriptionTv_new.visibility = View.GONE
-            }
-
             if (contentHome.watch != null && !TextUtils.isEmpty(contentHome.watch)) viewCountTv.text =
                 contentHome.watch
 
-
-            if (!contentHome.thumbs?.get(0)?.thumb?.large.isNullOrEmpty()) {
-                Glide.with(context).load(contentHome.thumbs?.get(0)?.thumb?.large)
-                    .error(R.mipmap.user_profile_placeholder).into(profilePictureImageView)
+            if (contentHome.layoutThumbs != null && contentHome.layoutThumbs.size > 0 && contentHome.layoutThumbs.get(
+                    0
+                ).imageSize.size > 0 && !contentHome.layoutThumbs.get(0).imageSize.get(0).url.isNullOrEmpty()
+            ) {
+                Glide.with(context)
+                    .load(contentHome.layoutThumbs.get(0).imageSize.get(0).url)
+                    .error(R.color.black)
+                    .into(videoImageView)
             }
 
 

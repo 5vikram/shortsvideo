@@ -16,6 +16,7 @@ import java.util.Set;
 public class CommonApiPresenterImpl implements CommonApiPresenter {
     private CommonApiListener networkResponseListener;
 
+
     public CommonApiPresenterImpl(CommonApiListener networkResponseListener) {
         this.networkResponseListener = networkResponseListener;
     }

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var videoList = arrayListOf<String>()
     private var endPointContentListUrl =
-        "https://expo.multitvsolution.com/api/v6/content/list/token/15zh353kd4dese/device/android/current_offset/0/max_counter/100/cat_id/3437"
+        "https://expo.multitvsolution.com/api/v6/content/list/token/66fa6b4ca3961/device/android/current_offset/0/max_counter/100/cat_id/5371"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,11 +44,15 @@ class MainActivity : AppCompatActivity() {
         }, 1000)
     }
 
+    private val token =
+        "abd07061a3dd9851e3c9dd551e68e26838b29e87b2baa479c0eb53c95cac2e6b9835d5a1b6b51c5dfb0febddf90338d925096a08fe746a6bd615205b5d1a29545d1b3c9fb826b9e787a6e8307c77423d"
+
+
     private fun getVideoDetailsData() {
         binding.centerProgressbar.visibility = View.VISIBLE
 
         val header = HashMap<String, String>()
-
+        header.put("authorization", token)
 
         CommonApiPresenterImpl(object : CommonApiListener {
             @SuppressLint("NotifyDataSetChanged")
