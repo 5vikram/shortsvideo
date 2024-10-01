@@ -100,14 +100,13 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     private lateinit var videoImageView: ImageView
     private lateinit var videoPauseButton: ImageView
     private lateinit var videoPlayButton: ImageView
-    private lateinit var bookmarkImageView: ImageView
     private lateinit var contentAdapterRecyclerview: RecyclerView
     private lateinit var timeBar: DefaultTimeBar
 
     private lateinit var muteButton: ImageView
     private lateinit var unmuteButton: ImageView
     private lateinit var exo_position: TextView
-    private lateinit var likeImageView: ImageView
+
 
 
     private var music01: ImageView? = null
@@ -371,131 +370,6 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         )
     }*/
 
-    private var isFavourite = 0
-    private var isFollow = 0
-    private var isWatchlist = 0
-
-
-    private fun bookMarkAPiRequest() {
-        val header = HashMap<String, String>()
-        val params = HashMap<String, String>()
-        val userId = SharedPreference().getPreferenceString(this, "user_id")
-        val userName = SharedPreference().getPreferenceString(this, "user_info")
-        params["u_id"] = userId.toString()
-        params["c_id"] = contentHomeList.get(mCurPos).id.toString()
-        params["tp"] = "favorite"
-
-        params["u_name"] = userName.toString()
-        params["c_name"] = "short videos"
-
-        params["st"] = "" + isWatchlist
-
-        //var contentListUrl=authModel.masterUrls.
-
-        CommonApiPresenterImpl(object : CommonApiListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(response: String) {
-                Log.e("Vikram:::", response)
-
-                val userBehivourData =
-                    Json.parse(response, USerLikeData::class.java) as USerLikeData
-
-                if (userBehivourData.code == 1) {
-                    if (userBehivourData.action.equals("1")) {
-                        isWatchlist = 0
-                        bookmarkImageView.setImageResource(R.drawable.bokkmark_selected)
-                    } else {
-                        isWatchlist = 1
-                        bookmarkImageView.setImageResource(R.drawable.bokkmark_unselected)
-                    }
-                } else {
-                    Toast.makeText(
-                        this@ShortsVideoActivity,
-                        "Something went wrong , please try again.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-
-            }
-
-            override fun onError(message: String?) {
-                Toast.makeText(
-                    this@ShortsVideoActivity,
-                    "Something went wrong , please try again.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-        }).postRequest(
-            "https://expo.multitvsolution.com/api/v6/user/behavior_post/token/15zh353kd4dese/device/web",
-            "Favourite",
-            params,
-            header
-        )
-    }
-
-
-    private fun likeApiRequest() {
-        val header = HashMap<String, String>()
-        val params = HashMap<String, String>()
-        val userId = SharedPreference().getPreferenceString(this, "user_id")
-        val userName = SharedPreference().getPreferenceString(this, "user_info")
-        params["u_id"] = userId.toString()
-        params["c_id"] = contentHomeList.get(mCurPos).id.toString()
-        params["tp"] = "like"
-
-        params["u_name"] = userName.toString()
-        params["c_name"] = "short videos"
-
-        params["st"] = "" + isFavourite
-
-
-        //var contentListUrl=authModel.masterUrls.
-
-        CommonApiPresenterImpl(object : CommonApiListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(response: String) {
-                Log.e("Vikram:::", response)
-
-                val userBehivourData =
-                    Json.parse(response, USerLikeData::class.java) as USerLikeData
-
-                if (userBehivourData.code == 1) {
-                    if (userBehivourData.action.equals("1")) {
-                        likeImageView.setImageResource(R.drawable.like)
-                        isFavourite = 0
-                    } else {
-                        likeImageView.setImageResource(R.drawable.unlike)
-                        isFavourite = 1
-                    }
-
-                } else {
-                    Toast.makeText(
-                        this@ShortsVideoActivity,
-                        "Something went wrong , please try again.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-
-            }
-
-            override fun onError(message: String?) {
-                Toast.makeText(
-                    this@ShortsVideoActivity,
-                    "Something went wrong , please try again.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-        }).postRequest(
-            "https://expo.multitvsolution.com/api/v6/user/behavior_post/token/15zh353kd4dese/device/web",
-            "Like",
-            params,
-            header
-        )
-    }
 
 
     private lateinit var httpDataSourceFactory: HttpDataSource.Factory
@@ -518,7 +392,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
         videoPlayButton = findViewByPosition.findViewById(R.id.pauseButton) as ImageView
 
-        timeBar = findViewByPosition.findViewById(R.id.exo_progress) as DefaultTimeBar
+        timeBar = findViewByPosition.findViewById(R.id.exoProgressBar) as DefaultTimeBar
 
         muteButton = findViewByPosition.findViewById(R.id.muteButton) as ImageView
 
@@ -527,39 +401,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         contentAdapterRecyclerview =
             findViewByPosition.findViewById(R.id.contentAdapterRecyclerview) as RecyclerView
 
-        exo_position = findViewByPosition.findViewById(R.id.exo_position) as TextView
-
-        likeImageView = findViewByPosition.findViewById(R.id.likeImageView) as ImageView
-
-        bookmarkImageView = findViewByPosition.findViewById(R.id.bookmarkImageView) as ImageView
-
-        val backButton = findViewByPosition.findViewById(R.id.backButton) as ImageView
-
-        backButton.setOnClickListener {
-            finish()
-        }
-
-        likeImageView.setOnClickListener {
-            val userData = SharedPreference().getPreferenceString(this, "user_id")
-
-            if (!userData.isNullOrEmpty()) {
-                likeApiRequest()
-            } else {
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
-
-        bookmarkImageView.setOnClickListener {
-            val userData = SharedPreference().getPreferenceString(this, "user_id")
-
-            if (!userData.isNullOrEmpty()) {
-                bookMarkAPiRequest()
-            } else {
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
+        exo_position = findViewByPosition.findViewById(R.id.exoPosition) as TextView
 
 
         videoPlayButton.setOnClickListener {
@@ -638,7 +480,6 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
         }
 
-        releaseVideoPlayer()
 
         val mediaItem = getMediaItem(
             contentHomeList.get(position).url.toString()
@@ -660,7 +501,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         styledPlayerView.player = mediaPlayer
         styledPlayerView.controllerHideOnTouch = true
         styledPlayerView.keepScreenOn = true
-        styledPlayerView.useController = false
+       // styledPlayerView.useController = false
         styledPlayerView.setControllerHideDuringAds(true)
 
 
@@ -767,9 +608,9 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) {
+                /*if (isPlaying) {
                     timeBar.setPosition(mediaPlayer!!.getCurrentPosition())
-                }
+                }*/
             }
         })
 
@@ -826,7 +667,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
                     videoImageView.visibility = View.GONE
                     binding.loadMoreProgressbar.visibility = View.GONE
                     // styledPlayerView.bringToFront()
-                    styledPlayerView.useController = true
+                   // styledPlayerView.useController = true
 
 
                     val durationMs = mediaPlayer?.duration!!
@@ -894,8 +735,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
     }
 
 
-    val timer = Timer()
-    val mainHandler = Handler(Looper.getMainLooper())
+
     private var customAdBannerTimer: CountDownTimerWithPause? = null
 
     private fun startCountDownTimer() {

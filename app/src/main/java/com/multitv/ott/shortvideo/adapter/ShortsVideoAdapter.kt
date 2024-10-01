@@ -101,8 +101,24 @@ class ShortsVideoAdapter(
             }
 
             val videoTitleTv_new = playerLayout.findViewById<TextView>(R.id.videoTitleTv)
-            val viewCountTv = playerLayout.findViewById<TextView>(R.id.viewCountTv)
             val videoImageView = playerLayout.findViewById<ImageView>(R.id.videoImageView)
+            val likeImageView = playerLayout.findViewById<ImageView>(R.id.likeImageView)
+
+            if (contentHome.isSelected)
+                likeImageView.setImageDrawable(context.getDrawable(R.drawable.like_selected))
+            else
+                likeImageView.setImageDrawable(context.getDrawable(R.drawable.like_unselected))
+
+            likeImageView.setOnClickListener {
+                if (contentHome.isSelected == true) {
+                    videoCacheUrlList.get(position).isSelected = false
+                    likeImageView.setImageDrawable(context.getDrawable(R.drawable.like_selected))
+                } else {
+                    videoCacheUrlList.get(position).isSelected = true
+                    likeImageView.setImageDrawable(context.getDrawable(R.drawable.like_unselected))
+                }
+            }
+
 
             if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title)) {
                 videoTitleTv_new.text = contentHome.title
@@ -111,8 +127,15 @@ class ShortsVideoAdapter(
                 videoTitleTv_new.visibility = View.GONE
             }
 
-            if (contentHome.watch != null && !TextUtils.isEmpty(contentHome.watch)) viewCountTv.text =
-                contentHome.watch
+
+            val videoDescriptionTv = playerLayout.findViewById<TextView>(R.id.videoDescriptionTv)
+            if (contentHome.des != null && !TextUtils.isEmpty(contentHome.des)) {
+                videoDescriptionTv.text = contentHome.des
+                videoDescriptionTv.visibility = View.VISIBLE
+            } else {
+                videoDescriptionTv.visibility = View.GONE
+            }
+
 
             if (contentHome.layoutThumbs != null && contentHome.layoutThumbs.size > 0 && contentHome.layoutThumbs.get(
                     0

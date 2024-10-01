@@ -1,3 +1,4 @@
+/*
 package com.multitv.ott.shortvideo.uttls
 
 import android.content.Context
@@ -111,4 +112,4 @@ object ExoUtils {
         val trackType = mappedTrackInfo.getRendererType(rendererIndex)
         return C.TRACK_TYPE_TEXT == trackType
     }
-}
+}*/

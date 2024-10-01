@@ -47,8 +47,8 @@ data class ContentItem(
     @field:SerializedName("is_favorite")
     val isFavorite: Int? = null,
 
-    @field:SerializedName("source")
-    val source: String? = null,
+    @field:SerializedName("isSelected")
+    var isSelected: Boolean = false,
 
     @field:SerializedName("title")
     val title: String? = null,
