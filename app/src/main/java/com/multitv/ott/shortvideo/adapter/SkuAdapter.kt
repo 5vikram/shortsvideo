@@ -65,7 +65,7 @@ class SkuAdapter(
         }
 
         if (contentHome.price != null && !TextUtils.isEmpty(contentHome.price)) {
-            itemViewHolder.priceTv.text = "Rs " + contentHome.price
+            itemViewHolder.priceTv.text = "AED " + contentHome.price
             itemViewHolder.priceTv.visibility = View.VISIBLE
             itemViewHolder.priceTv.paintFlags =
                 itemViewHolder.titleTv.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -75,7 +75,7 @@ class SkuAdapter(
 
 
         if (presentAmount > 0) {
-            itemViewHolder.discountPriceTv.text = "Rs $presentAmount"
+            itemViewHolder.discountPriceTv.text = "AED $presentAmount"
         } else {
             if (contentHome.discount != null && !TextUtils.isEmpty(contentHome.discount)) itemViewHolder.discountPriceTv.text =
                 contentHome.discount + " off"

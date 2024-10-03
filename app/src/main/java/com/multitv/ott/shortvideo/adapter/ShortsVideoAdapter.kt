@@ -16,7 +16,7 @@ import com.multitv.ott.shortvideo.R
 import com.multitv.ott.shortvideo.listener.OnLoadMoreListener
 import com.multitv.ott.shortvideo.listener.ShareVideoListener
 import com.multitv.ott.shortvideo.utils.Tracer
-import de.hdodenhof.circleimageview.CircleImageView
+
 
 class ShortsVideoAdapter(
     private val context: Context,
@@ -82,6 +82,8 @@ class ShortsVideoAdapter(
 
         @SuppressLint("SetTextI18n")
         fun onBind(context: Context, contentHome: ContentItem, position: Int) {
+
+
 
             val contentAdapterRecyclerview =
                 playerLayout.findViewById<RecyclerView>(R.id.contentAdapterRecyclerview)

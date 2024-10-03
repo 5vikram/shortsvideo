@@ -117,53 +117,6 @@
                         android:src="@drawable/share" />
 
 
-                    <RelativeLayout
-                        android:id="@+id/add_music"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true">
-
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="right|bottom">
-
-                                <ImageView
-                                    android:id="@+id/music_01"
-                                    android:layout_width="@dimen/_10sdp"
-                                    android:layout_height="@dimen/_10sdp"
-                                    android:layout_margin="5dp"
-                                    android:src="@drawable/music_w" />
-
-                                <ImageView
-                                    android:id="@+id/music_02"
-                                    android:layout_width="@dimen/_10sdp"
-                                    android:layout_height="@dimen/_10sdp"
-                                    android:layout_margin="5dp"
-                                    android:src="@drawable/music_w" />
-
-
-                                <ImageView
-                                    android:id="@+id/ivSoundTrack_HomeFragLay"
-                                    android:layout_width="50dp"
-                                    android:layout_height="50dp"
-                                    android:layout_marginBottom="5dp"
-                                    android:src="@drawable/cd" />
-                            </RelativeLayout>
-
-
-                        </LinearLayout>
-                    </RelativeLayout>
-
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>

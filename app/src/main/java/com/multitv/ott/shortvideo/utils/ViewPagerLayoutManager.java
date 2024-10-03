@@ -51,29 +51,11 @@ public class ViewPagerLayoutManager extends LinearLayoutManager implements Recyc
 
     @Override
     public void onScrollStateChanged(int state) {
-/*
-        if (state == RecyclerView.SCROLL_STATE_IDLE) {
-            View viewIdle = mPagerSnapHelper.findSnapView(ViewPagerLayoutManager.this);
-            int positionIdle = getPosition(viewIdle);
-            if (mOnViewPagerListener != null && getChildCount() == 1) {
-                mOnViewPagerListener.onPageSelected(positionIdle, positionIdle == getItemCount() - 1);
-            }
-        }
-*/
-
 
         if (mOnViewPagerListener != null) {
             View viewIdle = mPagerSnapHelper.findSnapView(ViewPagerLayoutManager.this);
             int positionIdle = getPosition(viewIdle);
             mOnViewPagerListener.onPageSelected(positionIdle, positionIdle == getItemCount() - 1);
-
-         /*   if (state == RecyclerView.SCROLL_STATE_IDLE) {
-                Tracer.error("RecyclerView State::::", "RecyclerView.SCROLL_STATE_IDLE"+"::::pos::"+positionIdle);
-            } else if (state == RecyclerView.SCROLL_STATE_DRAGGING) {
-                Tracer.error("RecyclerView State::::", "RecyclerView.SCROLL_STATE_DRAGGING"+"::::pos::"+positionIdle);
-            } else if (state == RecyclerView.SCROLL_STATE_SETTLING) {
-                Tracer.error("RecyclerView State::::", "RecyclerView.SCROLL_STATE_SETTLING"+"::::pos::"+positionIdle);
-            }*/
 
             if (state == RecyclerView.SCROLL_STATE_DRAGGING) {
                 if (mDrift >= 0) {
