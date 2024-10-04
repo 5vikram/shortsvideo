@@ -30,24 +30,14 @@ class SkuAdapter(
         val itemViewHolder = holder as ItemViewHolder
         val contentHome = categoryContentArrayList[position]
 
-        /*int widthAndHeightOfIcon = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, context.getResources().getDisplayMetrics());
-        int viewHeight = 0;
-        int viewWidht = 0;
-
-        viewWidht = ScreenUtils.INSTANCE.getScreenWidth(context) / 2 - widthAndHeightOfIcon;
-        viewHeight = viewWidht / 9 * 16 - 40;
-
-        RecyclerView.LayoutParams buttonLayoutParams = new RecyclerView.LayoutParams(viewWidht, viewHeight);
-        buttonLayoutParams.setMargins(0, 0, 10, 0);
-        itemViewHolder.cardView.setLayoutParams(buttonLayoutParams);*/
-        var presentAmount = 0
+        var presentAmount = 0.0F
 
         if (contentHome.price != null && !TextUtils.isEmpty(contentHome.price) && contentHome.discount != null && !TextUtils.isEmpty(
                 contentHome.discount
             )
         ) {
-            if (contentHome.price.toInt() > 0 && contentHome.discount.toInt() > 0) {
-                presentAmount = contentHome.price.toInt() - contentHome.discount.toInt()
+            if (contentHome.price.toFloat() > 0 && contentHome.discount.toFloat() > 0) {
+                presentAmount = contentHome.price.toFloat() - contentHome.discount.toFloat()
             }
         }
 
@@ -65,7 +55,8 @@ class SkuAdapter(
         }
 
         if (contentHome.price != null && !TextUtils.isEmpty(contentHome.price)) {
-            itemViewHolder.priceTv.text = "AED " + contentHome.price
+            val formattedPrice = String.format("%.2f", contentHome.price.toFloat())
+            itemViewHolder.priceTv.text = "AED " + formattedPrice
             itemViewHolder.priceTv.visibility = View.VISIBLE
             itemViewHolder.priceTv.paintFlags =
                 itemViewHolder.titleTv.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -75,10 +66,11 @@ class SkuAdapter(
 
 
         if (presentAmount > 0) {
-            itemViewHolder.discountPriceTv.text = "AED $presentAmount"
+            val formattedPrice = String.format("%.2f", presentAmount)
+            itemViewHolder.discountPriceTv.text = "AED $formattedPrice"
+            itemViewHolder.discountPriceTv.visibility = View.VISIBLE
         } else {
-            if (contentHome.discount != null && !TextUtils.isEmpty(contentHome.discount)) itemViewHolder.discountPriceTv.text =
-                contentHome.discount + " off"
+            itemViewHolder.discountPriceTv.visibility = View.GONE
         }
 
         itemViewHolder.adTobagTv.setOnClickListener {

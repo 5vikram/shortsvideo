@@ -548,9 +548,6 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
                     binding.loadMoreProgressbar.visibility = View.GONE
                     videoImageView.visibility = View.VISIBLE
 
-                    /*mediaPlayer?.repeatMode = Player.REPEAT_MODE_ONE
-                    if (markerPositions.size > 0) markerPositions.clear()*/
-
                     if (mCurPos < contentHomeList.size) {
                         mCurPos = mCurPos + 1
                         binding.tictocRecyclerview.smoothScrollToPosition(mCurPos)
