@@ -381,8 +381,6 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
                     unmuteButton.visibility = View.VISIBLE
                 }
             }
-
-
         }
         return super.onKeyDown(keyCode, event)
     }

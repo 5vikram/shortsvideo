@@ -47,12 +47,11 @@ class SkuAdapter(
         )
         else itemViewHolder.thumbnailIc.setImageResource(R.color.black)
 
-        if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title)) {
+        if (contentHome.title != null && !TextUtils.isEmpty(contentHome.title))
             itemViewHolder.titleTv.text = contentHome.title
-            itemViewHolder.titleTv.visibility = View.VISIBLE
-        } else {
+        else
             itemViewHolder.titleTv.text = context.getString(R.string.app_name)
-        }
+
 
         if (contentHome.price != null && !TextUtils.isEmpty(contentHome.price)) {
             val formattedPrice = String.format("%.2f", contentHome.price.toFloat())
