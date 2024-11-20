@@ -1,0 +1,63 @@
+{
+    "data": {
+        "tabs": [
+            {
+                "uniqueId": "m0001",
+                "titleDict": {
+                    "en": "Default",
+                    "zh": "默认"
+                },
+                "subItems": [
+                    {
+                        "uniqueId": "m0002",
+                        "titleDict": {
+                            "en": "left and right",
+                            "zh": "左右"
+                        },
+                        "builtInIcon": "eo_resource_duet_zuoyou.png",
+                        "md5": "D8600F49365D2BD1A9CEF98944E57866",
+                        "relativePath": "duet.bundle/zuoyou_7031878287731294252/zuoyou_7031878287731294252.zip",
+                        "param": {
+                            "key": "switchButton",
+                            "path": "duet.bundle/zuoyou_7031878287731294252/zuoyou_7031878287731294252",
+                            "type": 0,
+                            "val": 0
+                        }
+                    },
+                    {
+                        "uniqueId": "m0003",
+                        "titleDict": {
+                            "en": "Focus",
+                            "zh": "抢镜"
+                        },
+                        "builtInIcon": "eo_resource_duet_pip.png",
+                        "md5": "1F63D6835521ED2B51605351BE125F18",
+                        "relativePath": "duet.bundle/pip/pip.zip",
+                        "param": {
+                            "key": "switchButton",
+                            "path": "duet.bundle/pip/pip",
+                            "type": 2,
+                            "val": 0
+                        }
+                    },
+                    {
+                        "uniqueId": "m0004",
+                        "titleDict": {
+                            "en": "up and down",
+                            "zh": "上下"
+                        },
+                        "builtInIcon": "eo_resource_duet_shangxia.png",
+                        "md5": "14CA5C2653947C917D1FE77C2B7C0D1F",
+                        "relativePath": "duet.bundle/shangxia_7031878287731228716/shangxia_7031878287731228716.zip",
+                        "param": {
+                            "key": "switchButton",
+                            "path": "duet.bundle/shangxia_7031878287731228716/shangxia_7031878287731228716",
+                            "type": 1,
+                            "val": 0
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

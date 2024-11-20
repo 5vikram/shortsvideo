@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="eo_export_main">Export</string>
+    <string name="eo_export_cover_editor">Set video cover</string>
+    <string name="eo_export_resolution">Resolution</string>
+    <string name="eo_export_frameRate">Frame Per Second</string>
+    <string name="eo_export_video_compiling">"Compiling"</string>
+    <string name="eo_export_exit_title">Confirm to exit export?</string>
+    <string name="eo_export_exit_message">Exiting now will loss all current progress, confirm?</string>
+    <string name="eo_export_confirm">Confirm</string>
+    <string name="eo_export_cancel">Cancel</string>
+    <string name="eo_export_cover_frame">Select video frame</string>
+    <string name="eo_export_cover_album">Import from album</string>
+    <string name="eo_export_cover_operation">Drag the pointer to set select video frame</string>
+    <string name="eo_export_cover_selectagain">Select again</string>
+    <string name="eo_export_cover_savetolocal">save to local album</string>
+    <string name="eo_export_resolution_save">Save</string>
+    <string name="eo_export_resolution_reset">Reset</string>
+    <string name="eo_export_exit_export_tip">Cancel export</string>
+    <string name="eo_export_save_error">Save error</string>
+
+</resources>

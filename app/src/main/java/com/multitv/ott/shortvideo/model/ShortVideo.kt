@@ -1,7 +1,6 @@
 package com.multitv.ott.shortvideo
 
 import com.google.gson.annotations.SerializedName
-import com.multitv.ott.shortvideo.vikrammodel.Vikram
 
 data class ShortVideo(
 

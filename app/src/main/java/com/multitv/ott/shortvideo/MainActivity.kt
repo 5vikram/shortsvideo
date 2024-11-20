@@ -3,6 +3,7 @@ package com.multitv.ott.shortvideo
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -15,6 +16,14 @@ import com.multitv.ott.shortvideo.network.CommonApiPresenterImpl
 import com.multitv.ott.shortvideo.network.Json
 import com.multitv.ott.shortvideo.service.VideoPreLoadingService
 import com.multitv.ott.shortvideo.uttls.PlayerConstant
+import com.volcengine.ck.logkit.LogKit
+import com.volcengine.effectone.editorui.external.EOExportManager
+import com.volcengine.effectone.editorui.external.data.EOOutputVideoSettings
+import com.volcengine.effectone.editorui.external.impl.EOExportDefaultListener
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale.getDefault
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,13 +31,21 @@ class MainActivity : AppCompatActivity() {
     private var videoList = arrayListOf<String>()
     private var endPointContentListUrl =
         "https://expo.multitvsolution.com/api/v6/content/list/token/66fa6b4ca3961/device/android/current_offset/0/max_counter/100/cat_id/5371"
+    private val token =
+        "abd07061a3dd9851e3c9dd551e68e26838b29e87b2baa479c0eb53c95cac2e6b9835d5a1b6b51c5dfb0febddf90338d925096a08fe746a6bd615205b5d1a29545d1b3c9fb826b9e787a6e8307c77423d"
+
+    companion object {
+        var authResult = false
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        getVideoDetailsData()
 
+
+        getVideoDetailsData()
     }
 
     private fun startPreLoadingService() {
@@ -44,8 +61,6 @@ class MainActivity : AppCompatActivity() {
         }, 1000)
     }
 
-    private val token =
-        "abd07061a3dd9851e3c9dd551e68e26838b29e87b2baa479c0eb53c95cac2e6b9835d5a1b6b51c5dfb0febddf90338d925096a08fe746a6bd615205b5d1a29545d1b3c9fb826b9e787a6e8307c77423d"
 
 
     private fun getVideoDetailsData() {

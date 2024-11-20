@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/Black"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <!--    default content-->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/export_bottom_default_root"
+        android:name="com.volcengine.effectone.export.fragment.EffectOneExportDefaultFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--    cover Editor begin-->
+    <ViewStub
+        android:id="@+id/export_cover_editor_stub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:inflatedId="@+id/export_cover_editor_root"
+        android:layout="@layout/eo_main_layout_export_cover_editor" />
+    <!--    cover Editor begin-->
+
+    <!--    export progressbar-->
+    <ViewStub
+        android:id="@+id/export_progress_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:inflatedId="@+id/export_progress_root"
+        android:layout="@layout/eo_main_fragment_export_progress" />
+
+</merge>

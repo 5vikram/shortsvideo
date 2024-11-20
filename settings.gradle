@@ -12,6 +12,18 @@ pluginManagement {
         maven {
             url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
         }
+
+        maven { url 'https://artifact.bytedance.com/repository/Volcengine/' }
+        maven {
+            url "https://artifact.bytedance.com/repository/thrall_ck/"
+            credentials {
+                username = MAVEN_USER_NAME
+                password = MAVEN_PASS_WORD
+            }
+            authentication {
+                digest(BasicAuthentication)
+            }
+        }
     }
 }
 dependencyResolutionManagement {
@@ -28,7 +40,20 @@ dependencyResolutionManagement {
         maven {
             url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
         }
+        maven { url 'https://artifact.bytedance.com/repository/Volcengine/' }
+        maven {
+            url "https://artifact.bytedance.com/repository/thrall_ck/"
+            credentials {
+                username = MAVEN_USER_NAME
+                password = MAVEN_PASS_WORD
+            }
+            authentication {
+                digest(BasicAuthentication)
+            }
+        }
     }
 }
 rootProject.name = "shortvideo"
 include ':app'
+include ':export'
+include ':export'

@@ -22,7 +22,18 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
+                android:visibility="gone"
                 android:layout_alignParentBottom="true" />
+
+
+       <!--     <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/rv_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"/>-->
 
 
             <ProgressBar
@@ -63,6 +74,20 @@
             android:secondaryProgress="@android:integer/config_shortAnimTime"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/uploadVideoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:background="@drawable/button_bg"
+            android:text="Create Video"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
 
     </RelativeLayout>
 

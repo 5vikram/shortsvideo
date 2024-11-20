@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.iainconnor.objectcache.CacheManager
 import com.iainconnor.objectcache.DiskCache
+import com.multitv.ott.shortvideo.EOQuickInitHelper
 import com.multitv.ott.shortvideo.utils.NukeSSLCerts
 import com.multitv.ott.shortvideo.utils.Tracer
 import com.multitv.ott.shortvideo.utils.Uttils
@@ -71,6 +72,7 @@ class ApplicationController : MultiDexApplication() {
         NukeSSLCerts().nuke()
         instance = this
 
+
         val mDisplayMetrics = applicationContext.resources
             .displayMetrics
         screenWidth = mDisplayMetrics.widthPixels
@@ -80,6 +82,10 @@ class ApplicationController : MultiDexApplication() {
         leastRecentlyUsedCacheEvictor = LeastRecentlyUsedCacheEvictor(exoPlayerCacheSize)
         exoDatabaseProvider = ExoDatabaseProvider(this)
         simpleCache = SimpleCache(cacheDir, leastRecentlyUsedCacheEvictor, exoDatabaseProvider)
+
+        EOQuickInitHelper.licenseFileName =
+            "multitv1_test_20241029_20241129_com.multitv.ott.shortvideo_1.5.0_212.licbag" //Replace this with your own license name.
+        EOQuickInitHelper.initApplication(this)
     }
 
 
@@ -120,7 +126,6 @@ class ApplicationController : MultiDexApplication() {
             mRequestQueue!!.cancelAll(tag)
         }
     }
-
 
 
 }

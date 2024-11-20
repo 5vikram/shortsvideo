@@ -1,0 +1,145 @@
+{
+    "data": {
+        "tabs": [
+            {
+                "uniqueId": "f0001",
+                "titleDict": {
+                    "en": "Default",
+                    "zh": "默认"
+                },
+                "subItems": [
+                    {
+                        "uniqueId": "f0002",
+                        "titleDict": {
+                            "en": "Cat",
+                            "zh": "Cat"
+                        },
+                        "builtInIcon": "eo_resource_cat_7165698613938176002.gif",
+                        "md5": "9A59FDD7A5392619A202F554190A1415",
+                        "relativePath": "sticker.bundle/Cat_7165698613938176002/Cat_7165698613938176002.zip",
+                        "param": {
+                            "path": "sticker.bundle/Cat_7165698613938176002/Cat_7165698613938176002"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0003",
+                        "titleDict": {
+                            "en": "Dailyvlog",
+                            "zh": "Dailyvlog"
+                        },
+                        "builtInIcon": "eo_resource_dailyvlog_7165698572025331713.gif",
+                        "md5": "89B3A2B28C083F15C3CD0842C15D4C37",
+                        "relativePath": "sticker.bundle/dailyvlog_7165698572025331713/dailyvlog_7165698572025331713.zip",
+                        "param": {
+                            "path": "sticker.bundle/dailyvlog_7165698572025331713/dailyvlog_7165698572025331713"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0004",
+                        "titleDict": {
+                            "en": "Dog",
+                            "zh": "Dog"
+                        },
+                        "builtInIcon": "eo_resource_dog_7165698623212388353.gif",
+                        "md5": "185D3AC82BBA537BB893FF1537143FDC",
+                        "relativePath": "sticker.bundle/Dog_7165698623212388353/Dog_7165698623212388353.zip",
+                        "param": {
+                            "path": "sticker.bundle/Dog_7165698623212388353/Dog_7165698623212388353"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0005",
+                        "titleDict": {
+                            "en": "Happy",
+                            "zh": "Happy"
+                        },
+                        "builtInIcon": "eo_resource_happy_7165698519020404738.gif",
+                        "md5": "81054D6E844B188C2D8A4B781556828F",
+                        "relativePath": "sticker.bundle/happy_7165698519020404738/happy_7165698519020404738.zip",
+                        "param": {
+                            "path": "sticker.bundle/happy_7165698519020404738/happy_7165698519020404738"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0006",
+                        "titleDict": {
+                            "en": "LoveBubble",
+                            "zh": "LoveBubble"
+                        },
+                        "builtInIcon": "eo_resource_lovebubble_7165698429472342018.gif",
+                        "md5": "9E57BE03950F36BAF024CB15F651166D",
+                        "relativePath": "sticker.bundle/LoveBubble_7165698429472342018/LoveBubble_7165698429472342018.zip",
+                        "param": {
+                            "path": "sticker.bundle/LoveBubble_7165698429472342018/LoveBubble_7165698429472342018"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0007",
+                        "titleDict": {
+                            "en": "Plushpolarbear",
+                            "zh": "Plushpolarbear"
+                        },
+                        "builtInIcon": "eo_resource_plushpolarbear_7165699130890240001.gif",
+                        "md5": "B5FB396058F72C89BD6054B1B6BC3052",
+                        "relativePath": "sticker.bundle/Plushpolarbear_7165699130890240001/Plushpolarbear_7165699130890240001.zip",
+                        "param": {
+                            "path": "sticker.bundle/Plushpolarbear_7165699130890240001/Plushpolarbear_7165699130890240001"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0008",
+                        "titleDict": {
+                            "en": "Plushsocks",
+                            "zh": "Plushsocks"
+                        },
+                        "builtInIcon": "eo_resource_plushsocks_7165699130890878977.gif",
+                        "md5": "B1873EA3DEFD14160AEBE7421C3918ED",
+                        "relativePath": "sticker.bundle/Plushsocks_7165699130890878977/Plushsocks_7165699130890878977.zip",
+                        "param": {
+                            "path": "sticker.bundle/Plushsocks_7165699130890878977/Plushsocks_7165699130890878977"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0009",
+                        "titleDict": {
+                            "en": "Snowmountain",
+                            "zh": "Snowmountain"
+                        },
+                        "builtInIcon": "eo_resource_snowmountain_7165699130890731521.gif",
+                        "md5": "5D686F4EB66161CF3028D2CB7F3C8EC8",
+                        "relativePath": "sticker.bundle/Snowmountain_7165699130890731521/Snowmountain_7165699130890731521.zip",
+                        "param": {
+                            "path": "sticker.bundle/Snowmountain_7165699130890731521/Snowmountain_7165699130890731521"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0010",
+                        "titleDict": {
+                            "en": "Takeaselfie",
+                            "zh": "Takeaselfie"
+                        },
+                        "builtInIcon": "eo_resource_takeaselfie_7165698900544061442.gif",
+                        "md5": "E7928E7A15FA5B0806467E30DA384D68",
+                        "relativePath": "sticker.bundle/Takeaselfie_7165698900544061442/Takeaselfie_7165698900544061442.zip",
+                        "param": {
+                            "path": "sticker.bundle/Takeaselfie_7165698900544061442/Takeaselfie_7165698900544061442"
+                        }
+                    },
+                    {
+                        "uniqueId": "f0011",
+                        "titleDict": {
+                            "en": "Ticketboy",
+                            "zh": "Ticketboy"
+                        },
+                        "builtInIcon": "eo_resource_ticketboy_7165698877789716481.gif",
+                        "md5": "965360638EE2A8B22B744FBFE3F5BEFB",
+                        "relativePath": "sticker.bundle/Ticketboy_7165698877789716481/Ticketboy_7165698877789716481.zip",
+                        "param": {
+                            "path": "sticker.bundle/Ticketboy_7165698877789716481/Ticketboy_7165698877789716481"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

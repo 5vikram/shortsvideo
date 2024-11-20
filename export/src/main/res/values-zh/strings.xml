@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="eo_export_main">导出</string>
+    <string name="eo_export_cover_editor">设置封面</string>
+    <string name="eo_export_resolution">分辨率</string>
+    <string name="eo_export_frameRate">帧率</string>
+    <string name="eo_export_video_compiling">导出中</string>
+    <string name="eo_export_exit_title">确认退出导出页？</string>
+    <string name="eo_export_exit_message">退出导出将丢失当前效果，是否退出？</string>
+    <string name="eo_export_confirm">确认</string>
+    <string name="eo_export_cancel">取消</string>
+    <string name="eo_export_cover_frame">视频帧</string>
+    <string name="eo_export_cover_album">相册导入</string>
+    <string name="eo_export_cover_operation">滑动指针选择封面</string>
+    <string name="eo_export_cover_selectagain">重新选择</string>
+    <string name="eo_export_cover_savetolocal">已保存到本地相册</string>
+    <string name="eo_export_resolution_save">保存</string>
+    <string name="eo_export_resolution_reset">重置</string>
+    <string name="eo_export_exit_export_tip">取消导出</string>
+    <string name="eo_export_save_error">保存失败</string>
+</resources>
