@@ -50,7 +50,6 @@ class ShortsVideoAdapter(
                 }
             }
         })
-
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): TicTocViewHolder {

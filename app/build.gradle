@@ -16,6 +16,13 @@ android {
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
 
     buildTypes {
@@ -50,9 +57,14 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        exclude "lib/arm64-v8a/libc++_shared.so"
+        exclude "lib/armeabi-v7a/libc++_shared.so"
+        exclude "lib/x86/libc++_shared.so"
+        exclude "lib/x86_64/libc++_shared.so"
     }
+
+
+
 }
 
 /*
@@ -73,6 +85,7 @@ afterEvaluate {
 
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.media3:media3-exoplayer-ima:1.3.0'
     implementation "androidx.core:core:1.12.0"
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -105,9 +118,9 @@ dependencies {
     //cache
     implementation 'com.iainconnor:objectcache:0.0.18-SNAPSHOT'
 
-    api "com.volcengine.effectone:editor-ui:1.5.0"
-    api "com.volcengine.effectone:recorder-ui:1.5.0"
-    api "com.volcengine.effectone:base-resource:1.5.0"
+   // api "com.volcengine.effectone:editor-ui:1.5.0"
+   // api "com.volcengine.effectone:recorder-ui:1.5.0"
+   // api "com.volcengine.effectone:base-resource:1.5.0"
 
     implementation project(":export")
 }

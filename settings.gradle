@@ -56,4 +56,3 @@ dependencyResolutionManagement {
 rootProject.name = "shortvideo"
 include ':app'
 include ':export'
-include ':export'
