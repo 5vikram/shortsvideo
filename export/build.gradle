@@ -12,6 +12,11 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
     }
 
     buildTypes {
@@ -29,11 +34,13 @@ android {
     }
 
     packagingOptions {
-        exclude "lib/arm64-v8a/libc++_shared.so"
-        exclude "lib/armeabi-v7a/libc++_shared.so"
-        exclude "lib/x86/libc++_shared.so"
-        exclude "lib/x86_64/libc++_shared.so"
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        pickFirst "lib/arm64-v8a/libc++_shared.so"
+        pickFirst "lib/armeabi-v7a/libc++_shared.so"
     }
+
 }
 
 dependencies {
@@ -45,9 +52,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 
-    api "com.volcengine.effectone:editor-ui:1.5.0"
-    api "com.volcengine.effectone:recorder-ui:1.5.0"
-    api "com.volcengine.effectone:base-resource:1.5.0"
+    implementation ("com.volcengine.effectone:base-resource:1.5.0") {
+        exclude group: 'lib', module: 'c++_shared'
+    }
+    implementation ("com.volcengine.effectone:editor-ui:1.5.0") {
+        exclude group: 'lib', module: 'c++_shared'
+    }
+    implementation ("com.volcengine.effectone:recorder-ui:1.5.0") {
+        exclude group: 'lib', module: 'c++_shared'
+    }
     implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
     implementation 'com.geyifeng.immersionbar:immersionbar-ktx:3.2.2'
 

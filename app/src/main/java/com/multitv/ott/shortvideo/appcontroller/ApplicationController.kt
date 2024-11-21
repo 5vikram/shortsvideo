@@ -51,11 +51,14 @@ class ApplicationController : MultiDexApplication() {
         )?.put(key, null)
     }
 
+
+
     companion object {
 
-        private lateinit var instance: ApplicationController
+        private var instance: ApplicationController? = null
+
         fun getInstance(): ApplicationController {
-            return instance
+            return instance ?: throw IllegalStateException("ApplicationController not initialized!")
         }
 
         lateinit var simpleCache: SimpleCache

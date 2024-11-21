@@ -117,7 +117,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
 
     // private var vaildationTokenRequest: String? = null
     private lateinit var authModel: AuthModel
-
+    var authResult = false
 
     private lateinit var binding: ShortVideoLayoutBinding
 
@@ -128,7 +128,7 @@ class ShortsVideoActivity : AppCompatActivity(), OnLoadMoreListener, ShareVideoL
         binding = DataBindingUtil.setContentView(this, R.layout.short_video_layout)
 
         EOQuickInitHelper.prepareAndInit { isSuccess, msg ->
-            MainActivity.authResult = isSuccess
+            authResult = isSuccess
         }
 
 
